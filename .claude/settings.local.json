@@ -1,0 +1,46 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unzip -l TestAudio3.0.zip)",
+      "Bash(grep -E \"^.*/$\")",
+      "Bash(unzip -p TestAudio3.0.zip \"TestAudio3.0/de-DE/1l_de-DE_female-DT1/trans.txt\")",
+      "Bash(grep \"/$\")",
+      "Bash(awk '{print $NF}')",
+      "Bash(grep -E \"^TestAudio3.0/[a-z]{2}-[A-Z]{2}/$\")",
+      "Bash(grep -E \"^TestAudio3.0/[a-z]{2}-[A-Z]{2}/1l.*/$\")",
+      "Bash(grep \"\\\\.wav$\")",
+      "Bash(awk -F'/' '{if \\(NF>=4\\) print $\\(NF-1\\)}')",
+      "Bash(unzip -p TestAudio3.0.zip \"TestAudio3.0/en-GB/1l_en-GB_female-DT1/trans.txt\")",
+      "Bash(unzip -p TestAudio3.0.zip \"TestAudio3.0/es-ES/1l_es-ES_male-DT1/trans.txt\")",
+      "Bash(unzip -o TestAudio3.0.zip -d .)",
+      "Bash(cp \"d:/dev/tokyo-asr-benchmarking/.env\" \"d:/dev/test-mazda-asr-multilingual/.env\")",
+      "Bash(where python *)",
+      "Bash(python3 -m pip install -r \"d:/dev/test-mazda-asr-multilingual/requirements.txt\")",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -X utf8 run_full.py --languages de-DE --max-per-dataset 30 --workers 4)",
+      "Bash(python3 -X utf8 run_full.py --languages en-GB --max-per-dataset 30 --workers 4)",
+      "Bash(python3 -X utf8 run_full.py --languages es-ES --max-per-dataset 30 --workers 4)",
+      "Bash(python3 -X utf8 run_full.py --languages fr-FR --max-per-dataset 30 --workers 4)",
+      "Bash(python3 -X utf8 run_full.py --languages it-IT --max-per-dataset 30 --workers 4)",
+      "Bash(mkdir -p \"d:/dev/test-mazda-asr-multilingual/.claude/skills/asr-justify\")",
+      "Edit(/.claude/skills/asr-justify/**)",
+      "Bash(python3 -X utf8 -c ' *)",
+      "Bash(find /d/dev/test-mazda-asr-multilingual/results/audio/de-DE* -type f)",
+      "Bash(xxd \"d:/dev/test-mazda-asr-multilingual/TestAudio3.0/de-DE/1l_de-DE_female-DT1/trans.txt\")",
+      "Read(//c/Program Files/7-Zip/**)",
+      "Read(//c/Program Files \\(x86\\)/7-Zip/**)",
+      "Bash(where 7z)",
+      "Bash(where 7za)",
+      "Read(//c/Program Files/**)",
+      "Read(//usr/**)",
+      "Bash(python -c ' *)",
+      "Bash(xargs grep -l \"build_report\\\\|regenerate\\\\|re.*report\")",
+      "Bash(python run_full.py --languages de-DE en-GB --workers 4)",
+      "Bash(xargs grep -A 17 \"^| Dataset\")"
+    ],
+    "additionalDirectories": [
+      "d:\\dev\\tokyo-asr-benchmarking",
+      "d:\\dev\\test-mazda-asr-multilingual\\.claude\\skills"
+    ]
+  }
+}
