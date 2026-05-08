@@ -14,7 +14,9 @@ The benchmark covers **five Azure services**:
 
 - `fast_default` — Azure Fast Transcription (api-version `2024-11-15`).
 - `fast_llm` — Azure Fast Transcription with `enhancedMode.enabled=true`
-  (LLM Speech preview, api-version `2025-10-15`).
+  (LLM Speech preview, api-version `2025-10-15`). **No locale set** —
+  relies on auto-detection, which causes language confusion errors
+  (e.g., German recognized as English).
 - `fast_mai` — Azure Fast Transcription with
   `enhancedMode.model="mai-transcribe-1"` and per-language locale.
 - `realtime` — Speech SDK continuous recognition with PushAudioInputStream.
@@ -27,8 +29,9 @@ Per run, four artifacts live under `results/`:
 |---|---|
 | `<run>.csv` | Per-sample, per-service results. Columns include `wer`, `sentence_error`, `ins`, `del`, `sub`, `ref_len`, `first_latency_ms`, `lbl_ms`, `upl_ms`, `upl_self_ms`, `upl_anchor`, `speech_start_s`, `speech_end_s`, `boundary_fix_action`, `first_word_start_s`, `last_word_end_s`, `error`, `locale`. |
 | `<run>_report.md` | Auto-generated headline aggregate table, dataset / endpoint sections, latency definitions, and a Speech-boundary section listing trimmed samples. |
-| `<run>_error_analysis.md` | Companion produced by [scripts/error_analysis.py](../../scripts/error_analysis.py): excludes data-issue rows, lists best/median/worst per (dataset, service), top fast_default-vs-realtime disagreements, with `[▶]` audio links. |
+| `<run>_error_analysis.md` | Companion produced by [scripts/error_analysis.py](../../scripts/error_analysis.py): excludes data-issue rows (empty hyp, short ref, all-agree-vs-ref, compound artifacts), lists best/median/worst per (dataset, service), top fast_default-vs-realtime disagreements, with `[▶]` audio links. |
 | `<run>_words.jsonl` | One JSON object per realtime sample: full word-level timestamps + the boundary-fix decision. Read this when investigating any sample whose `boundary_fix_action != "none"`. |
+| `<run>.csv.strict` | (Created by `scripts/loose_match.py`.) Backup of the CSV before loose-match normalization was applied. Compare against the main CSV to see which rows were corrected. |
 
 The user typically invokes this as: *"justify results/<run>.csv"*. If
 they give only the CSV path, derive the report and error-analysis paths
@@ -66,7 +69,19 @@ by replacing `.csv` with `_report.md` / `_error_analysis.md`.
    were `skip` for the latency QA pass above.
 5. **Listen to flagged audio** when needed via the `[▶]` links in the
    error analysis (they resolve to `results/audio/<dataset>/<id>.wav`).
-6. **Write the justification** to `results/<run>_justification.md`. Skeleton:
+6. **Loose-match review.** If `<run>.csv.strict` exists, the CSV has
+   already been through `scripts/loose_match.py`. Compare strict vs
+   loose to understand which false positives were eliminated:
+   - **Compound-word splits** — `stummschalten` ↔ `stumm schalten`,
+     `Außenluftzirkulation` ↔ `Außenluft-Zirkulation`. Common in German.
+   - **Alphanumeric spacing** — `2D` ↔ `2 D`.
+   - **Degree/percent symbols** — `360°` ↔ `360 gradi`, `60%` ↔ `60 %`.
+   - **Reference typos** — `d'emergenzaa` ↔ `d'emergenza a` (Italian).
+   
+   The justification should cite both strict and loose WER when the gap
+   is meaningful: `"strict WER 0.33 → loose WER 0.28 after compound-word
+   normalization"`. If the gap is large for a service, call that out.
+7. **Write the justification** to `results/<run>_justification.md`. Skeleton:
 
    - **Headline numbers (recap)** — copy the filtered aggregate table
      from the error analysis (not the unfiltered one from `_report.md`).
@@ -78,13 +93,17 @@ by replacing `.csv` with `_report.md` / `_error_analysis.md`.
        too short for the audio). Quote ref + audio duration.
      - "All services agree, ref disagrees" rows — these survive the
        filter only when at least one service breaks ranks.
+     - Compound-word / segmentation artifacts that were caught by the
+       filter or loose matching. Quote a few examples.
      - Stylistic deltas (punctuation, casing) that inflate WER without
        representing recognition error. Quote 3-4 median rows side-by-side.
      - Anchor-trim rows: when boundary_fix trimmed an edge word, briefly
        say what realtime hallucinated and how that would have skewed UPL
        if uncorrected.
    - **Where the services genuinely disagree** — after excluding the
-     above, summarize the residue.
+     above, summarize the residue. Watch for `fast_llm` language
+     confusion (it has no locale set and may recognize German/French
+     audio as English).
    - **INS / DEL / SUB shape** — the breakdown columns reveal *what kind*
      of error each engine makes:
      - High INS rate → engine adds words not in ref (often filler /
@@ -103,14 +122,35 @@ by replacing `.csv` with `_report.md` / `_error_analysis.md`.
    - **Recommendations** — 4-6 bullets. Be specific: which service for
      which use case, what to investigate next, what to disregard.
 
-7. **Do not invent numbers.** Every percentage, every WER, every sample
+8. **Do not invent numbers.** Every percentage, every WER, every sample
    ID in the prose must come from the CSV / report / error analysis. If
    the data doesn't support a claim, drop the claim.
 
-8. **Be honest about dataset quality.** Mazda voice commands are short
+9. **Be honest about dataset quality.** Mazda voice commands are short
    utterances — WER on short references is noisier than on longer speech.
    A single word error on a 3-word command gives 33% WER. Point this out
-   when relevant.
+   when relevant. German has particularly poor data quality (30/90
+   samples excluded, mostly empty hypotheses from audio issues).
+
+## Known data issues
+
+These patterns were discovered during benchmarking and should be noted
+in every justification that encounters them:
+
+- **UTF-8/CP437 encoding corruption** — trans.txt files and wav filenames
+  originally had umlauts/accents corrupted (ö → ├╢). Fixed by reverse
+  CP437→UTF-8 conversion. If you see box-drawing characters in ref/hyp,
+  the fix was not applied.
+- **German compound words** — German freely joins words
+  ("Außenluftzirkulation"), but ASR often splits them ("Außenluft
+  Zirkulation"). The loose-match script and the error_analysis compound
+  filter handle the most common cases, but some still leak through when
+  only some services split.
+- **fast_llm language confusion** — `fast_llm` does not set a locale
+  (only `enhancedMode.enabled=true`), so it auto-detects language. For
+  German especially, it sometimes recognizes audio as English.
+- **Reference typos** — Italian `d'emergenzaa` (double-a) in 3 samples.
+  Caught by loose matching.
 
 ## Anchored UPL — what to know
 
@@ -135,13 +175,42 @@ If a justification cites a specific UPL number, glance at
 `upl_anchor` for that row first — anchored numbers are comparable, self
 fallback numbers are not.
 
+## Loose matching pipeline
+
+`scripts/loose_match.py` applies automatic normalization to detect
+false-positive WER caused by formatting differences, not recognition
+errors. It works by canonicalizing both ref and hyp (space removal,
+degree/percent symbol normalization) and setting WER=0 for rows where
+the canonical forms match.
+
+```bash
+# Apply loose matching (backs up strict CSV automatically)
+python -X utf8 scripts/loose_match.py results/<run>.csv
+
+# Then regenerate reports
+python -X utf8 -c "
+from benchmark.report import build_report
+from scripts.error_analysis import main as ea_main
+from pathlib import Path
+csv_path = Path('results/<run>.csv')
+build_report(csv_path, csv_path.with_name(csv_path.stem + '_report.md'))
+ea_main(csv_path, csv_path.with_name(csv_path.stem + '_error_analysis.md'))
+"
+```
+
+The error_analysis also has its own compound-word filter (rule 4) that
+excludes samples where ALL services produce text matching ref after
+space removal. The loose-match script is more aggressive: it zeroes WER
+on individual rows even when only some services match.
+
 ## Audio links
 
 `results/audio/<dataset>/<sample_id>.wav` — single canonical location,
 regenerated idempotently when error_analysis runs. The directory is safe
 to delete; it'll be recreated next time. Markdown links in the error
 analysis use a relative path so they resolve when the md is opened
-directly in `results/`.
+directly in `results/`. Filenames with Unicode characters are
+percent-encoded in the links.
 
 ## Style
 

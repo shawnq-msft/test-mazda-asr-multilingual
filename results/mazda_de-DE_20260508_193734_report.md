@@ -5,7 +5,7 @@ Tester public IP: **167.220.233.51**
 Tester location: **Tokyo, Tokyo, Japan** (Microsoft Corporation)  
 Azure region: **eastus**  
 Azure endpoint host: **eastus.api.cognitive.microsoft.com**  
-TCP ping to `eastus.api.cognitive.microsoft.com:443` (avg of 5): **240.9 ms**  
+TCP ping to `eastus.api.cognitive.microsoft.com:443` (avg of 5): **237.0 ms**  
 VAD set to **500 ms** (realtime `Speech_SegmentationSilenceTimeoutMs`; fast_* audio truncated at `speech_end + 500 ms`)
 
 ## Endpoints under test
@@ -61,20 +61,20 @@ WER breakdown columns are *rates per 100 reference words*. Per-row WER ≈ (INS 
 | Dataset | Service | N | Errors | WER | SER | INS/100 | DEL/100 | SUB/100 | First Latency ms (mean / p90) | LBL ms (mean / p90) | UPL ms (mean / p90) |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|---|---|
 | de-DE_DT1 | fast_default | 30 | 0 | 0.575 | 0.733 | 9.3 | 26.3 | 33.9 | - | 717 / 1146 | 1659 / 2986 |
-| de-DE_DT1 | fast_llm | 30 | 0 | 0.566 | 0.733 | 16.1 | 10.2 | 46.6 | - | 563 / 595 | 1586 / 2784 |
-| de-DE_DT1 | fast_mai | 30 | 0 | 0.508 | 0.733 | 17.8 | 10.2 | 34.7 | - | 502 / 590 | 865 / 1147 |
+| de-DE_DT1 | fast_llm | 30 | 0 | 0.549 | 0.700 | 15.3 | 10.2 | 45.8 | - | 563 / 595 | 1586 / 2784 |
+| de-DE_DT1 | fast_mai | 30 | 0 | 0.475 | 0.700 | 16.9 | 10.2 | 33.9 | - | 502 / 590 | 865 / 1147 |
 | de-DE_DT1 | realtime | 30 | 0 | 0.571 | 0.800 | 2.5 | 37.3 | 18.6 | 1565 / 1896 | -1133 / -580 | 771 / 958 |
 | de-DE_DT1 | realtime_refine | 30 | 0 | 0.492 | 0.733 | 12.7 | 11.9 | 35.6 | 1569 / 1870 | -492 / 58 | 1368 / 1745 |
-| de-DE_DT2 | fast_default | 30 | 0 | 0.717 | 0.833 | 14.4 | 33.1 | 38.1 | - | 671 / 821 | 1894 / 3062 |
+| de-DE_DT2 | fast_default | 30 | 0 | 0.684 | 0.800 | 13.6 | 33.1 | 37.3 | - | 671 / 821 | 1894 / 3062 |
 | de-DE_DT2 | fast_llm | 30 | 0 | 0.663 | 0.800 | 21.2 | 20.3 | 45.8 | - | 492 / 564 | 2162 / 4145 |
-| de-DE_DT2 | fast_mai | 30 | 0 | 0.636 | 0.833 | 23.7 | 16.9 | 42.4 | - | 543 / 643 | 769 / 1181 |
-| de-DE_DT2 | realtime | 30 | 0 | 0.718 | 0.867 | 1.7 | 61.0 | 9.3 | 1501 / 1708 | -779 / -371 | 835 / 970 |
-| de-DE_DT2 | realtime_refine | 30 | 0 | 0.679 | 0.833 | 11.9 | 32.2 | 33.1 | 1452 / 1707 | -414 / 474 | 1342 / 2035 |
-| de-DE_JT1 | fast_default | 30 | 0 | 0.417 | 0.667 | 2.5 | 12.7 | 26.3 | - | 636 / 800 | 1263 / 1461 |
-| de-DE_JT1 | fast_llm | 30 | 0 | 0.370 | 0.600 | 3.4 | 13.6 | 20.3 | - | 484 / 539 | 1114 / 1106 |
-| de-DE_JT1 | fast_mai | 30 | 0 | 0.319 | 0.567 | 3.4 | 11.0 | 15.3 | - | 497 / 575 | 991 / 1141 |
-| de-DE_JT1 | realtime | 30 | 0 | 0.344 | 0.700 | 5.1 | 11.9 | 16.9 | 1344 / 1639 | -1022 / -419 | 671 / 877 |
-| de-DE_JT1 | realtime_refine | 30 | 0 | 0.361 | 0.567 | 2.5 | 12.7 | 18.6 | 1483 / 1662 | -560 / 65 | 1151 / 1228 |
+| de-DE_DT2 | fast_mai | 30 | 0 | 0.602 | 0.800 | 22.9 | 16.9 | 41.5 | - | 543 / 643 | 769 / 1181 |
+| de-DE_DT2 | realtime | 30 | 0 | 0.685 | 0.833 | 0.8 | 61.0 | 8.5 | 1501 / 1708 | -779 / -371 | 835 / 970 |
+| de-DE_DT2 | realtime_refine | 30 | 0 | 0.646 | 0.800 | 11.0 | 32.2 | 32.2 | 1452 / 1707 | -414 / 474 | 1342 / 2035 |
+| de-DE_JT1 | fast_default | 30 | 0 | 0.351 | 0.600 | 0.8 | 12.7 | 24.6 | - | 636 / 800 | 1263 / 1461 |
+| de-DE_JT1 | fast_llm | 30 | 0 | 0.320 | 0.533 | 1.7 | 13.6 | 18.6 | - | 484 / 539 | 1114 / 1106 |
+| de-DE_JT1 | fast_mai | 30 | 0 | 0.252 | 0.500 | 1.7 | 11.0 | 13.6 | - | 497 / 575 | 991 / 1141 |
+| de-DE_JT1 | realtime | 30 | 0 | 0.294 | 0.633 | 3.4 | 11.9 | 15.3 | 1344 / 1639 | -1022 / -419 | 671 / 877 |
+| de-DE_JT1 | realtime_refine | 30 | 0 | 0.295 | 0.500 | 0.8 | 12.7 | 16.9 | 1483 / 1662 | -560 / 65 | 1151 / 1228 |
 
 ## Speech boundaries
 

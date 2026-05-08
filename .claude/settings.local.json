@@ -36,7 +36,13 @@
       "Bash(python -c ' *)",
       "Bash(xargs grep -l \"build_report\\\\|regenerate\\\\|re.*report\")",
       "Bash(python run_full.py --languages de-DE en-GB --workers 4)",
-      "Bash(xargs grep -A 17 \"^| Dataset\")"
+      "Bash(xargs grep -A 17 \"^| Dataset\")",
+      "Bash(python -X utf8 scripts/loose_match.py results/mazda_de-DE_20260508_193734.csv)",
+      "Bash(python -X utf8 scripts/loose_match.py results/mazda_en-GB_20260508_194552.csv)",
+      "Bash(python -X utf8 scripts/loose_match.py results/mazda_es-ES_20260508_120527.csv)",
+      "Bash(python -X utf8 scripts/loose_match.py results/mazda_fr-FR_20260508_131357.csv)",
+      "Bash(python -X utf8 scripts/loose_match.py results/mazda_it-IT_20260508_133009.csv)",
+      "Bash(python -X utf8 -c ' *)"
     ],
     "additionalDirectories": [
       "d:\\dev\\tokyo-asr-benchmarking",

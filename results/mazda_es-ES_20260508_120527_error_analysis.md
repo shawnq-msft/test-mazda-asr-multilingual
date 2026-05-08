@@ -4,6 +4,7 @@ Filters out samples that look like *data* problems rather than recognition error
 1. **Empty hypothesis** — at least one service returned no text.
 2. **Reference much shorter than audio** — `words_per_s < 0.3` (with `duration ≥ 1 s`). At normal speech rates this means the label is missing content.
 3. **All services agree, ref disagrees** — mean pairwise WER between hypotheses < 0.15 AND mean WER vs ref > 0.5. Multiple ASR systems converging on the same answer that differs from the reference is a strong signal of a mislabeled ground truth, not a shared error.
+4. **Compound-word / segmentation artifact** — all services produce text identical to the reference after removing spaces (e.g. `stummschalten` vs `stumm schalten`). These are correct recognitions scored as errors due to tokenization.
 
 Audio links (▶) point to `results/audio/<dataset>/<sample_id>.wav` so a reviewer can play the clip directly.
 
@@ -20,6 +21,7 @@ Excluded as data issues: **9**
 - Empty hypothesis: 9
 - Reference too short for audio: 0
 - All services agree, ref disagrees: 0
+- Compound-word / segmentation artifact: 0
 
 ## Speech boundaries
 
@@ -39,7 +41,7 @@ INS/DEL/SUB are *rates per 100 reference words*. Their sum ≈ WER × 100.
 | es-ES_DT1 | realtime | 25 | 0.140 | 0.520 | 2.1 | 4.8 | 6.2 | -88 / 2 | 676 / 843 |
 | es-ES_DT1 | realtime_refine | 25 | 0.074 | 0.400 | 0.0 | 2.1 | 4.8 | 337 / 403 | 1029 / 1201 |
 | es-ES_DT2 | fast_default | 27 | 0.106 | 0.519 | 0.0 | 1.3 | 8.9 | 569 / 619 | 1114 / 1160 |
-| es-ES_DT2 | fast_llm | 27 | 0.103 | 0.407 | 0.0 | 5.7 | 4.4 | 489 / 537 | 1033 / 1085 |
+| es-ES_DT2 | fast_llm | 27 | 0.088 | 0.370 | 0.0 | 5.1 | 3.8 | 489 / 537 | 1033 / 1085 |
 | es-ES_DT2 | fast_mai | 27 | 0.097 | 0.296 | 2.5 | 0.6 | 7.0 | 499 / 607 | 1043 / 1198 |
 | es-ES_DT2 | realtime | 27 | 0.120 | 0.519 | 1.3 | 3.8 | 7.0 | -111 / 91 | 702 / 912 |
 | es-ES_DT2 | realtime_refine | 27 | 0.142 | 0.556 | 3.2 | 1.3 | 8.9 | 343 / 654 | 1082 / 1463 |
@@ -54,12 +56,12 @@ INS/DEL/SUB are *rates per 100 reference words*. Their sum ≈ WER × 100.
 | Dataset | Service | N | WER | SER | INS/100 | DEL/100 | SUB/100 |
 |---|---|---:|---:|---:|---:|---:|---:|
 | es-ES_DT1 | fast_default | 30 | 0.147 | 0.433 | 0.0 | 6.4 | 8.1 |
-| es-ES_DT1 | fast_llm | 30 | 0.202 | 0.467 | 1.2 | 8.1 | 10.5 |
+| es-ES_DT1 | fast_llm | 30 | 0.189 | 0.433 | 1.2 | 7.6 | 9.9 |
 | es-ES_DT1 | fast_mai | 30 | 0.172 | 0.400 | 0.0 | 8.7 | 7.0 |
 | es-ES_DT1 | realtime | 30 | 0.283 | 0.600 | 1.7 | 19.8 | 5.2 |
 | es-ES_DT1 | realtime_refine | 30 | 0.162 | 0.467 | 0.0 | 11.0 | 4.7 |
 | es-ES_DT2 | fast_default | 30 | 0.169 | 0.567 | 0.0 | 5.2 | 9.9 |
-| es-ES_DT2 | fast_llm | 30 | 0.164 | 0.467 | 1.2 | 7.0 | 7.0 |
+| es-ES_DT2 | fast_llm | 30 | 0.151 | 0.433 | 1.2 | 6.4 | 6.4 |
 | es-ES_DT2 | fast_mai | 30 | 0.161 | 0.367 | 2.9 | 0.6 | 12.2 |
 | es-ES_DT2 | realtime | 30 | 0.208 | 0.567 | 1.2 | 11.6 | 6.4 |
 | es-ES_DT2 | realtime_refine | 30 | 0.188 | 0.567 | 2.9 | 4.1 | 9.9 |
@@ -90,6 +92,10 @@ INS/DEL/SUB are *rates per 100 reference words*. Their sum ≈ WER × 100.
 _(none)_
 
 ### All services agree, reference disagrees (likely mislabeled)
+
+_(none)_
+
+### Compound-word / segmentation artifacts
 
 _(none)_
 
@@ -167,9 +173,9 @@ Best / median / worst WER per (dataset, service) on the kept samples.
 **BEST** — `1l_es-ES_female-DT2/141.Apaga la música por Bluetooth.wav` [▶](audio/es-ES_DT2/1l_es-ES_female-DT2/141.Apaga%20la%20m%C3%BAsica%20por%20Bluetooth.wav.wav)  wer=0.000  speech=[1.24s, 2.64s]  fix=none
 - ref: `Apaga la música por Bluetooth`
 - hyp: `Apaga la música por Bluetooth.`
-**MEDIAN** — `1l_es-ES_male-DT2/025.Deslice el asiento hacia adelante.wav` [▶](audio/es-ES_DT2/1l_es-ES_male-DT2/025.Deslice%20el%20asiento%20hacia%20adelante.wav.wav)  wer=0.000  speech=[1.14s, 3.3s]  fix=none
-- ref: `Deslice el asiento hacia adelante`
-- hyp: `Deslice el asiento hacia adelante.`
+**MEDIAN** — `1l_es-ES_female-DT2/004.Activa el modo ventilación del aire acondicionado.wav` [▶](audio/es-ES_DT2/1l_es-ES_female-DT2/004.Activa%20el%20modo%20ventilaci%C3%B3n%20del%20aire%20acondicionado.wav.wav)  wer=0.000  speech=[1.31s, 4.07s]  fix=none
+- ref: `Activa el modo ventilación del aire acondicionado`
+- hyp: `Activa el modo ventilación del aire acondicionado.`
 **WORST** — `1l_es-ES_female-DT2/082.Actualiza la lista de dispositivos Bluetooth.wav` [▶](audio/es-ES_DT2/1l_es-ES_female-DT2/082.Actualiza%20la%20lista%20de%20dispositivos%20Bluetooth.wav.wav)  wer=0.500  speech=[1.43s, 3.39s]  fix=none
 - ref: `Actualiza la lista de dispositivos Bluetooth`
 - hyp: `Abrir lista de dispositivos.`

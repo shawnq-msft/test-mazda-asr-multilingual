@@ -5,7 +5,7 @@ Tester public IP: **167.220.233.51**
 Tester location: **Tokyo, Tokyo, Japan** (Microsoft Corporation)  
 Azure region: **eastus**  
 Azure endpoint host: **eastus.api.cognitive.microsoft.com**  
-TCP ping to `eastus.api.cognitive.microsoft.com:443` (avg of 5): **228.2 ms**  
+TCP ping to `eastus.api.cognitive.microsoft.com:443` (avg of 5): **227.7 ms**  
 VAD set to **500 ms** (realtime `Speech_SegmentationSilenceTimeoutMs`; fast_* audio truncated at `speech_end + 500 ms`)
 
 ## Endpoints under test
@@ -60,21 +60,21 @@ WER breakdown columns are *rates per 100 reference words*. Per-row WER ≈ (INS 
 
 | Dataset | Service | N | Errors | WER | SER | INS/100 | DEL/100 | SUB/100 | First Latency ms (mean / p90) | LBL ms (mean / p90) | UPL ms (mean / p90) |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|---|---|
-| it-IT_DT1 | fast_default | 30 | 0 | 0.089 | 0.300 | 2.4 | 0.6 | 5.9 | - | 617 / 723 | 1021 / 1251 |
-| it-IT_DT1 | fast_llm | 30 | 0 | 0.072 | 0.267 | 1.8 | 1.2 | 4.7 | - | 513 / 627 | 917 / 1167 |
-| it-IT_DT1 | fast_mai | 30 | 0 | 0.096 | 0.300 | 2.4 | 0.0 | 5.3 | - | 491 / 608 | 895 / 1138 |
-| it-IT_DT1 | realtime | 30 | 0 | 0.097 | 0.367 | 3.6 | 1.2 | 5.3 | 1213 / 1691 | -118 / 301 | 603 / 869 |
-| it-IT_DT1 | realtime_refine | 30 | 0 | 0.082 | 0.267 | 1.8 | 1.2 | 4.7 | 1157 / 1526 | 336 / 748 | 1081 / 1317 |
-| it-IT_DT2 | fast_default | 30 | 0 | 0.185 | 0.433 | 1.2 | 7.1 | 10.7 | - | 653 / 731 | 1163 / 1309 |
-| it-IT_DT2 | fast_llm | 30 | 0 | 0.205 | 0.433 | 3.0 | 4.1 | 14.2 | - | 524 / 622 | 992 / 1190 |
-| it-IT_DT2 | fast_mai | 30 | 0 | 0.183 | 0.467 | 2.4 | 2.4 | 13.6 | - | 500 / 570 | 886 / 1059 |
-| it-IT_DT2 | realtime | 30 | 0 | 0.246 | 0.500 | 2.4 | 11.8 | 11.2 | 1207 / 1544 | -97 / 321 | 624 / 864 |
-| it-IT_DT2 | realtime_refine | 30 | 0 | 0.180 | 0.433 | 1.8 | 5.9 | 10.7 | 1249 / 1580 | 386 / 782 | 1260 / 2006 |
-| it-IT_JT1 | fast_default | 30 | 0 | 0.055 | 0.233 | 1.2 | 0.6 | 3.6 | - | 625 / 728 | 1012 / 1239 |
-| it-IT_JT1 | fast_llm | 30 | 0 | 0.053 | 0.200 | 1.8 | 0.6 | 3.0 | - | 507 / 584 | 894 / 1114 |
-| it-IT_JT1 | fast_mai | 30 | 0 | 0.042 | 0.200 | 1.2 | 0.0 | 3.0 | - | 551 / 724 | 938 / 1153 |
-| it-IT_JT1 | realtime | 30 | 0 | 0.042 | 0.200 | 0.6 | 0.6 | 3.0 | 1114 / 1378 | -144 / 295 | 556 / 787 |
-| it-IT_JT1 | realtime_refine | 30 | 0 | 0.055 | 0.233 | 1.2 | 0.6 | 3.6 | 1098 / 1414 | 333 / 712 | 1043 / 1280 |
+| it-IT_DT1 | fast_default | 30 | 0 | 0.079 | 0.267 | 1.8 | 0.6 | 5.3 | - | 617 / 723 | 1021 / 1251 |
+| it-IT_DT1 | fast_llm | 30 | 0 | 0.062 | 0.233 | 1.2 | 1.2 | 4.1 | - | 513 / 627 | 917 / 1167 |
+| it-IT_DT1 | fast_mai | 30 | 0 | 0.087 | 0.267 | 1.8 | 0.0 | 4.7 | - | 491 / 608 | 895 / 1138 |
+| it-IT_DT1 | realtime | 30 | 0 | 0.088 | 0.333 | 3.0 | 1.2 | 4.7 | 1213 / 1691 | -118 / 301 | 603 / 869 |
+| it-IT_DT1 | realtime_refine | 30 | 0 | 0.072 | 0.233 | 1.2 | 1.2 | 4.1 | 1157 / 1526 | 336 / 748 | 1081 / 1317 |
+| it-IT_DT2 | fast_default | 30 | 0 | 0.176 | 0.400 | 0.6 | 7.1 | 10.1 | - | 653 / 731 | 1163 / 1309 |
+| it-IT_DT2 | fast_llm | 30 | 0 | 0.196 | 0.400 | 2.4 | 4.1 | 13.6 | - | 524 / 622 | 992 / 1190 |
+| it-IT_DT2 | fast_mai | 30 | 0 | 0.173 | 0.433 | 1.8 | 2.4 | 13.0 | - | 500 / 570 | 886 / 1059 |
+| it-IT_DT2 | realtime | 30 | 0 | 0.236 | 0.467 | 1.8 | 11.8 | 10.7 | 1207 / 1544 | -97 / 321 | 624 / 864 |
+| it-IT_DT2 | realtime_refine | 30 | 0 | 0.170 | 0.400 | 1.2 | 5.9 | 10.1 | 1249 / 1580 | 386 / 782 | 1260 / 2006 |
+| it-IT_JT1 | fast_default | 30 | 0 | 0.045 | 0.200 | 0.6 | 0.6 | 3.0 | - | 625 / 728 | 1012 / 1239 |
+| it-IT_JT1 | fast_llm | 30 | 0 | 0.044 | 0.167 | 1.2 | 0.6 | 2.4 | - | 507 / 584 | 894 / 1114 |
+| it-IT_JT1 | fast_mai | 30 | 0 | 0.032 | 0.167 | 0.6 | 0.0 | 2.4 | - | 551 / 724 | 938 / 1153 |
+| it-IT_JT1 | realtime | 30 | 0 | 0.032 | 0.167 | 0.0 | 0.6 | 2.4 | 1114 / 1378 | -144 / 295 | 556 / 787 |
+| it-IT_JT1 | realtime_refine | 30 | 0 | 0.045 | 0.200 | 0.6 | 0.6 | 3.0 | 1098 / 1414 | 333 / 712 | 1043 / 1280 |
 
 ## Speech boundaries
 

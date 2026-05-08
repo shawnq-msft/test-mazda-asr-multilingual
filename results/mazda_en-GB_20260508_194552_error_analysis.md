@@ -4,6 +4,7 @@ Filters out samples that look like *data* problems rather than recognition error
 1. **Empty hypothesis** — at least one service returned no text.
 2. **Reference much shorter than audio** — `words_per_s < 0.3` (with `duration ≥ 1 s`). At normal speech rates this means the label is missing content.
 3. **All services agree, ref disagrees** — mean pairwise WER between hypotheses < 0.15 AND mean WER vs ref > 0.5. Multiple ASR systems converging on the same answer that differs from the reference is a strong signal of a mislabeled ground truth, not a shared error.
+4. **Compound-word / segmentation artifact** — all services produce text identical to the reference after removing spaces (e.g. `stummschalten` vs `stumm schalten`). These are correct recognitions scored as errors due to tokenization.
 
 Audio links (▶) point to `results/audio/<dataset>/<sample_id>.wav` so a reviewer can play the clip directly.
 
@@ -20,6 +21,7 @@ Excluded as data issues: **3**
 - Empty hypothesis: 2
 - Reference too short for audio: 0
 - All services agree, ref disagrees: 1
+- Compound-word / segmentation artifact: 0
 
 ## Speech boundaries
 
@@ -91,6 +93,10 @@ _(none)_
 - fast_mai       `Play 100.7 FM.`
 - realtime       `Play 100.7 FM.`
 - realtime_refine `Play 100.7 FM.`
+
+### Compound-word / segmentation artifacts
+
+_(none)_
 
 ## Genuine recognition errors (filtered set)
 

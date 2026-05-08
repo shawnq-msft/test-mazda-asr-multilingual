@@ -5,7 +5,7 @@ Tester public IP: **167.220.233.51**
 Tester location: **Tokyo, Tokyo, Japan** (Microsoft Corporation)  
 Azure region: **eastus**  
 Azure endpoint host: **eastus.api.cognitive.microsoft.com**  
-TCP ping to `eastus.api.cognitive.microsoft.com:443` (avg of 5): **221.8 ms**  
+TCP ping to `eastus.api.cognitive.microsoft.com:443` (avg of 5): **238.8 ms**  
 VAD set to **500 ms** (realtime `Speech_SegmentationSilenceTimeoutMs`; fast_* audio truncated at `speech_end + 500 ms`)
 
 ## Endpoints under test
@@ -61,12 +61,12 @@ WER breakdown columns are *rates per 100 reference words*. Per-row WER ≈ (INS 
 | Dataset | Service | N | Errors | WER | SER | INS/100 | DEL/100 | SUB/100 | First Latency ms (mean / p90) | LBL ms (mean / p90) | UPL ms (mean / p90) |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|---|---|
 | es-ES_DT1 | fast_default | 30 | 0 | 0.147 | 0.433 | 0.0 | 6.4 | 8.1 | - | 573 / 641 | 1177 / 1443 |
-| es-ES_DT1 | fast_llm | 30 | 0 | 0.202 | 0.467 | 1.2 | 8.1 | 10.5 | - | 487 / 530 | 1097 / 1414 |
+| es-ES_DT1 | fast_llm | 30 | 0 | 0.189 | 0.433 | 1.2 | 7.6 | 9.9 | - | 487 / 530 | 1097 / 1414 |
 | es-ES_DT1 | fast_mai | 30 | 0 | 0.172 | 0.400 | 0.0 | 8.7 | 7.0 | - | 509 / 665 | 974 / 1154 |
 | es-ES_DT1 | realtime | 30 | 0 | 0.283 | 0.600 | 1.7 | 19.8 | 5.2 | 1349 / 1778 | -88 / 2 | 676 / 843 |
 | es-ES_DT1 | realtime_refine | 30 | 0 | 0.162 | 0.467 | 0.0 | 11.0 | 4.7 | 1365 / 1605 | 312 / 403 | 1036 / 1255 |
 | es-ES_DT2 | fast_default | 30 | 0 | 0.169 | 0.567 | 0.0 | 5.2 | 9.9 | - | 569 / 619 | 1141 / 1179 |
-| es-ES_DT2 | fast_llm | 30 | 0 | 0.164 | 0.467 | 1.2 | 7.0 | 7.0 | - | 488 / 537 | 1073 / 1230 |
+| es-ES_DT2 | fast_llm | 30 | 0 | 0.151 | 0.433 | 1.2 | 6.4 | 6.4 | - | 488 / 537 | 1073 / 1230 |
 | es-ES_DT2 | fast_mai | 30 | 0 | 0.161 | 0.367 | 2.9 | 0.6 | 12.2 | - | 496 / 607 | 989 / 1198 |
 | es-ES_DT2 | realtime | 30 | 0 | 0.208 | 0.567 | 1.2 | 11.6 | 6.4 | 1256 / 1501 | -111 / 91 | 702 / 912 |
 | es-ES_DT2 | realtime_refine | 30 | 0 | 0.188 | 0.567 | 2.9 | 4.1 | 9.9 | 1468 / 2479 | 337 / 752 | 1146 / 1542 |

@@ -115,6 +115,7 @@ def main(csv_path: Path, out_path: Path) -> None:
     excluded_empty: list[tuple[str, str, str]] = []
     excluded_short_ref: list[tuple[str, str, float, str]] = []
     excluded_mislabel: list[tuple[str, str, float, str, dict]] = []
+    excluded_compound: list[tuple[str, str, str, dict]] = []
 
     keep: set[tuple[str, str]] = set()
 
@@ -158,6 +159,15 @@ def main(csv_path: Path, out_path: Path) -> None:
             excluded_mislabel.append((ds, sid, mean_agree_wer, ref, hyps))
             continue
 
+        ref_joined = normalize_text(ref).replace(" ", "")
+        all_compound = all(
+            normalize_text(hyps[s]).replace(" ", "") == ref_joined
+            for s in present
+        )
+        if all_compound and mean_ref_wer > 0:
+            excluded_compound.append((ds, sid, ref, hyps))
+            continue
+
         keep.add(key)
 
     by_key_filtered: dict[tuple[str, str], list[dict]] = defaultdict(list)
@@ -175,6 +185,8 @@ def main(csv_path: Path, out_path: Path) -> None:
     for ds, sid, _, _ in excluded_short_ref:
         needed.add((ds, sid))
     for ds, sid, _, _, _ in excluded_mislabel:
+        needed.add((ds, sid))
+    for ds, sid, _, _ in excluded_compound:
         needed.add((ds, sid))
 
     by_pair_filtered_for_needed: dict[tuple[str, str], list[dict]] = defaultdict(list)
@@ -236,6 +248,7 @@ def main(csv_path: Path, out_path: Path) -> None:
     lines.append("1. **Empty hypothesis** — at least one service returned no text.")
     lines.append("2. **Reference much shorter than audio** — `words_per_s < 0.3` (with `duration ≥ 1 s`). At normal speech rates this means the label is missing content.")
     lines.append("3. **All services agree, ref disagrees** — mean pairwise WER between hypotheses < 0.15 AND mean WER vs ref > 0.5. Multiple ASR systems converging on the same answer that differs from the reference is a strong signal of a mislabeled ground truth, not a shared error.")
+    lines.append("4. **Compound-word / segmentation artifact** — all services produce text identical to the reference after removing spaces (e.g. `stummschalten` vs `stumm schalten`). These are correct recognitions scored as errors due to tokenization.")
     lines.append("")
     lines.append("Audio links (▶) point to `results/audio/<dataset>/<sample_id>.wav` so a reviewer can play the clip directly.")
     lines.append("")
@@ -260,6 +273,7 @@ def main(csv_path: Path, out_path: Path) -> None:
     lines.append(f"- Empty hypothesis: {len(excluded_empty)}")
     lines.append(f"- Reference too short for audio: {len(excluded_short_ref)}")
     lines.append(f"- All services agree, ref disagrees: {len(excluded_mislabel)}")
+    lines.append(f"- Compound-word / segmentation artifact: {len(excluded_compound)}")
     lines.append("")
 
     # Speech boundaries
@@ -362,6 +376,22 @@ def main(csv_path: Path, out_path: Path) -> None:
         if len(excluded_mislabel) > 15:
             lines.append(f"_(+{len(excluded_mislabel) - 15} more)_\n")
 
+    lines.append("### Compound-word / segmentation artifacts")
+    lines.append("")
+    if not excluded_compound:
+        lines.append("_(none)_\n")
+    else:
+        for ds, sid, ref, hyps in sorted(excluded_compound)[:15]:
+            link = _audio_link(out_dir, ds, sid, audio_cache, samples_by_key)
+            lines.append(f"#### {ds}/{sid}{link}")
+            lines.append(f"- ref:           `{ref}`")
+            for s in SERVICES:
+                if s in hyps:
+                    lines.append(f"- {s:<14} `{hyps[s]}`")
+            lines.append("")
+        if len(excluded_compound) > 15:
+            lines.append(f"_(+{len(excluded_compound) - 15} more)_\n")
+
     # Genuine recognition errors
     lines.append("## Genuine recognition errors (filtered set)\n")
     lines.append("Best / median / worst WER per (dataset, service) on the kept samples.\n")
@@ -421,7 +451,7 @@ def main(csv_path: Path, out_path: Path) -> None:
     audio_count = sum(1 for v in audio_cache.values() if v is not None)
     print(f"Wrote {out_path}")
     print(f"Total: {total_samples}, kept: {kept_samples}, dropped: {dropped}")
-    print(f"  empty: {len(excluded_empty)}  short_ref: {len(excluded_short_ref)}  mislabel: {len(excluded_mislabel)}")
+    print(f"  empty: {len(excluded_empty)}  short_ref: {len(excluded_short_ref)}  mislabel: {len(excluded_mislabel)}  compound: {len(excluded_compound)}")
     print(f"  audio files emitted/linked: {audio_count}")
 
 
