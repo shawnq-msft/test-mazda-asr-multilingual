@@ -42,11 +42,13 @@
       "Bash(python -X utf8 scripts/loose_match.py results/mazda_es-ES_20260508_120527.csv)",
       "Bash(python -X utf8 scripts/loose_match.py results/mazda_fr-FR_20260508_131357.csv)",
       "Bash(python -X utf8 scripts/loose_match.py results/mazda_it-IT_20260508_133009.csv)",
-      "Bash(python -X utf8 -c ' *)"
+      "Bash(python -X utf8 -c ' *)",
+      "Bash(rm -f results/mazda_de-DE_20260508_112711* results/mazda_en-GB_20260508_115844*)"
     ],
     "additionalDirectories": [
       "d:\\dev\\tokyo-asr-benchmarking",
-      "d:\\dev\\test-mazda-asr-multilingual\\.claude\\skills"
+      "d:\\dev\\test-mazda-asr-multilingual\\.claude\\skills",
+      "d:\\dev\\test-mazda-asr-multilingual\\results"
     ]
   }
 }

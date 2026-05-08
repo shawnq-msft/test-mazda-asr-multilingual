@@ -1,11 +1,5 @@
 # Error analysis — mazda_de-DE_20260508_193734.csv
 
-Filters out samples that look like *data* problems rather than recognition errors:
-1. **Empty hypothesis** — at least one service returned no text.
-2. **Reference much shorter than audio** — `words_per_s < 0.3` (with `duration ≥ 1 s`). At normal speech rates this means the label is missing content.
-3. **All services agree, ref disagrees** — mean pairwise WER between hypotheses < 0.15 AND mean WER vs ref > 0.5. Multiple ASR systems converging on the same answer that differs from the reference is a strong signal of a mislabeled ground truth, not a shared error.
-4. **Compound-word / segmentation artifact** — all services produce text identical to the reference after removing spaces (e.g. `stummschalten` vs `stumm schalten`). These are correct recognitions scored as errors due to tokenization.
-
 Audio links (▶) point to `results/audio/<dataset>/<sample_id>.wav` so a reviewer can play the clip directly.
 
 ## Datasets under test
@@ -14,14 +8,7 @@ Audio links (▶) point to `results/audio/<dataset>/<sample_id>.wav` so a review
 - **de-DE_DT2** — Mazda de-DE DT2 voice commands (male + female pooled)
 - **de-DE_JT1** — Mazda de-DE JT1 voice commands (male + female pooled)
 
-Total complete samples: **90**  
-Kept after filtering: **60**  
-Excluded as data issues: **30**  
-
-- Empty hypothesis: 27
-- Reference too short for audio: 0
-- All services agree, ref disagrees: 1
-- Compound-word / segmentation artifact: 2
+Total samples: **90**  
 
 ## Speech boundaries
 
@@ -29,224 +16,141 @@ Excluded as data issues: **30**
 
 Boundary-fix actions across 90 realtime samples: `skip`=33, `trim_first`=6, `trim_last`=4
 
-## Filtered results (excludes data issues)
+## Results
 
 INS/DEL/SUB are *rates per 100 reference words*. Their sum ≈ WER × 100.
 
 | Dataset | Service | N | WER | SER | INS/100 | DEL/100 | SUB/100 | LBL ms (mean / p90) | UPL ms (mean / p90) |
 |---|---|---:|---:|---:|---:|---:|---:|---|---|
-| de-DE_DT1 | fast_default | 20 | 0.445 | 0.650 | 6.0 | 14.5 | 34.9 | 725 / 1250 | 1459 / 2829 |
-| de-DE_DT1 | fast_llm | 20 | 0.431 | 0.600 | 7.2 | 6.0 | 38.6 | 555 / 540 | 1282 / 2757 |
-| de-DE_DT1 | fast_mai | 20 | 0.283 | 0.600 | 0.0 | 6.0 | 24.1 | 495 / 590 | 995 / 1171 |
-| de-DE_DT1 | realtime | 20 | 0.427 | 0.750 | 3.6 | 19.3 | 22.9 | -1140 / -472 | 772 / 1460 |
-| de-DE_DT1 | realtime_refine | 20 | 0.363 | 0.650 | 4.8 | 6.0 | 32.5 | -552 / 280 | 1354 / 1745 |
-| de-DE_DT2 | fast_default | 13 | 0.290 | 0.538 | 8.3 | 2.1 | 27.1 | 702 / 745 | 1380 / 1802 |
-| de-DE_DT2 | fast_llm | 13 | 0.280 | 0.538 | 8.3 | 4.2 | 20.8 | 506 / 568 | 1182 / 1660 |
-| de-DE_DT2 | fast_mai | 13 | 0.217 | 0.538 | 0.0 | 2.1 | 20.8 | 530 / 639 | 996 / 1199 |
-| de-DE_DT2 | realtime | 13 | 0.298 | 0.615 | 2.1 | 8.3 | 20.8 | -695 / -371 | 700 / 860 |
-| de-DE_DT2 | realtime_refine | 13 | 0.275 | 0.538 | 2.1 | 4.2 | 22.9 | -260 / 33 | 1188 / 1282 |
-| de-DE_JT1 | fast_default | 27 | 0.353 | 0.630 | 0.9 | 11.8 | 26.4 | 637 / 800 | 1228 / 1381 |
-| de-DE_JT1 | fast_llm | 27 | 0.318 | 0.556 | 1.8 | 12.7 | 20.0 | 486 / 525 | 1076 / 1100 |
-| de-DE_JT1 | fast_mai | 27 | 0.243 | 0.519 | 1.8 | 10.0 | 14.5 | 496 / 575 | 1023 / 1141 |
-| de-DE_JT1 | realtime | 27 | 0.290 | 0.667 | 3.6 | 10.9 | 16.4 | -1047 / -419 | 667 / 877 |
-| de-DE_JT1 | realtime_refine | 27 | 0.290 | 0.519 | 0.9 | 11.8 | 18.2 | -581 / 65 | 1154 / 1228 |
+| de-DE_DT1 | fast_default | 30 | 0.575 | 0.733 | 9.3 | 26.3 | 33.9 | 717 / 1146 | 1659 / 2986 |
+| de-DE_DT1 | fast_llm | 30 | 0.549 | 0.700 | 15.3 | 10.2 | 45.8 | 563 / 595 | 1586 / 2784 |
+| de-DE_DT1 | fast_mai | 30 | 0.475 | 0.700 | 16.9 | 10.2 | 33.9 | 502 / 590 | 865 / 1147 |
+| de-DE_DT1 | realtime | 30 | 0.571 | 0.800 | 2.5 | 37.3 | 18.6 | -1133 / -580 | 771 / 958 |
+| de-DE_DT1 | realtime_refine | 30 | 0.492 | 0.733 | 12.7 | 11.9 | 35.6 | -492 / 58 | 1368 / 1745 |
+| de-DE_DT2 | fast_default | 30 | 0.684 | 0.800 | 13.6 | 33.1 | 37.3 | 671 / 821 | 1894 / 3062 |
+| de-DE_DT2 | fast_llm | 30 | 0.663 | 0.800 | 21.2 | 20.3 | 45.8 | 492 / 564 | 2162 / 4145 |
+| de-DE_DT2 | fast_mai | 30 | 0.602 | 0.800 | 22.9 | 16.9 | 41.5 | 543 / 643 | 769 / 1181 |
+| de-DE_DT2 | realtime | 30 | 0.685 | 0.833 | 0.8 | 61.0 | 8.5 | -779 / -371 | 835 / 970 |
+| de-DE_DT2 | realtime_refine | 30 | 0.646 | 0.800 | 11.0 | 32.2 | 32.2 | -414 / 474 | 1342 / 2035 |
+| de-DE_JT1 | fast_default | 30 | 0.351 | 0.600 | 0.8 | 12.7 | 24.6 | 636 / 800 | 1263 / 1461 |
+| de-DE_JT1 | fast_llm | 30 | 0.320 | 0.533 | 1.7 | 13.6 | 18.6 | 484 / 539 | 1114 / 1106 |
+| de-DE_JT1 | fast_mai | 30 | 0.252 | 0.500 | 1.7 | 11.0 | 13.6 | 497 / 575 | 991 / 1141 |
+| de-DE_JT1 | realtime | 30 | 0.294 | 0.633 | 3.4 | 11.9 | 15.3 | -1022 / -419 | 671 / 877 |
+| de-DE_JT1 | realtime_refine | 30 | 0.295 | 0.500 | 0.8 | 12.7 | 16.9 | -560 / 65 | 1151 / 1228 |
 
-## Unfiltered results (all complete samples, for reference)
+## Best / median / worst WER per (dataset, service)
 
-| Dataset | Service | N | WER | SER | INS/100 | DEL/100 | SUB/100 |
-|---|---|---:|---:|---:|---:|---:|---:|
-| de-DE_DT1 | fast_default | 30 | 0.575 | 0.733 | 9.3 | 26.3 | 33.9 |
-| de-DE_DT1 | fast_llm | 30 | 0.549 | 0.700 | 15.3 | 10.2 | 45.8 |
-| de-DE_DT1 | fast_mai | 30 | 0.475 | 0.700 | 16.9 | 10.2 | 33.9 |
-| de-DE_DT1 | realtime | 30 | 0.571 | 0.800 | 2.5 | 37.3 | 18.6 |
-| de-DE_DT1 | realtime_refine | 30 | 0.492 | 0.733 | 12.7 | 11.9 | 35.6 |
-| de-DE_DT2 | fast_default | 30 | 0.684 | 0.800 | 13.6 | 33.1 | 37.3 |
-| de-DE_DT2 | fast_llm | 30 | 0.663 | 0.800 | 21.2 | 20.3 | 45.8 |
-| de-DE_DT2 | fast_mai | 30 | 0.602 | 0.800 | 22.9 | 16.9 | 41.5 |
-| de-DE_DT2 | realtime | 30 | 0.685 | 0.833 | 0.8 | 61.0 | 8.5 |
-| de-DE_DT2 | realtime_refine | 30 | 0.646 | 0.800 | 11.0 | 32.2 | 32.2 |
-| de-DE_JT1 | fast_default | 30 | 0.351 | 0.600 | 0.8 | 12.7 | 24.6 |
-| de-DE_JT1 | fast_llm | 30 | 0.320 | 0.533 | 1.7 | 13.6 | 18.6 |
-| de-DE_JT1 | fast_mai | 30 | 0.252 | 0.500 | 1.7 | 11.0 | 13.6 |
-| de-DE_JT1 | realtime | 30 | 0.294 | 0.633 | 3.4 | 11.9 | 15.3 |
-| de-DE_JT1 | realtime_refine | 30 | 0.295 | 0.500 | 0.8 | 12.7 | 16.9 |
-
-## Excluded samples — examples
-
-### Empty hypothesis
-
-| Audio | Dataset | Sample | Empty in | Reference |
-|---|---|---|---|---|
-| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Fahren%20Sie%20nach%20Birmingham.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Fahren Sie nach Birmingham.wav | fast_default,fast_mai,realtime,realtime_refine | `Fahren Sie nach Birmingham` |
-| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Navigation%20stummschalten.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Navigation stummschalten.wav | realtime | `Navigation stummschalten` |
-| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Linke%20R%C3%BCcksitzbel%C3%BCftung%20leicht%20erh%C3%B6hen.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Linke Rücksitzbelüftung leicht erhöhen.wav | fast_default,realtime | `Linke Rücksitzbelüftung leicht erhöhen` |
-| [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Vorderen%20Bereich%20etwas%20erw%C3%A4rmen.wav.wav) | de-DE_DT1 | 1l_de-DE_male-DT1/Vorderen Bereich etwas erwärmen.wav | realtime | `Vorderen Bereich etwas erwärmen` |
-| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Eco-Fahrmodus%20aktivieren.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Eco-Fahrmodus aktivieren.wav | fast_default,realtime,realtime_refine | `Eco-Fahrmodus aktivieren` |
-| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20deaktivieren.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Automatische Belüftung beim Entriegeln deaktivieren.wav | fast_default | `Automatische Belüftung beim Entriegeln deaktivieren` |
-| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20aktivieren.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Automatische Belüftung beim Entriegeln aktivieren.wav | realtime | `Automatische Belüftung beim Entriegeln aktivieren` |
-| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Linke%20R%C3%BCcksitzbel%C3%BCftung%20auf%20Maximum.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Linke Rücksitzbelüftung auf Maximum.wav | realtime | `Linke Rücksitzbelüftung auf Maximum` |
-| [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Klingelton%20stummschalten.wav.wav) | de-DE_DT1 | 1l_de-DE_male-DT1/Klingelton stummschalten.wav | realtime | `Klingelton stummschalten` |
-| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Fahren%20Sie%20nach%20Birmingham.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Fahren Sie nach Birmingham.wav | fast_default,fast_mai,realtime | `Fahren Sie nach Birmingham` |
-| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Autofenster%20halb%20%C3%B6ffnen.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Autofenster halb öffnen.wav | realtime | `Autofenster halb öffnen` |
-| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Navigation%20stummschalten.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Navigation stummschalten.wav | realtime,realtime_refine | `Navigation stummschalten` |
-| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/L%C3%BCfter%20um%201%20Stufe%20erh%C3%B6hen.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Lüfter um 1 Stufe erhöhen.wav | fast_default,fast_llm,fast_mai,realtime,realtime_refine | `Lüfter um 1 Stufe erhöhen` |
-| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Linke%20R%C3%BCcksitzbel%C3%BCftung%20leicht%20erh%C3%B6hen.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Linke Rücksitzbelüftung leicht erhöhen.wav | fast_default,realtime | `Linke Rücksitzbelüftung leicht erhöhen` |
-| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Eco-Fahrmodus%20aktivieren.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Eco-Fahrmodus aktivieren.wav | fast_default,fast_mai,realtime,realtime_refine | `Eco-Fahrmodus aktivieren` |
-| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Die%20letzte.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Die letzte.wav | fast_default,fast_mai,realtime,realtime_refine | `Die letzte` |
-| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20deaktivieren.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Automatische Belüftung beim Entriegeln deaktivieren.wav | realtime | `Automatische Belüftung beim Entriegeln deaktivieren` |
-| [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Fenster%20%C3%B6ffnen.wav.wav) | de-DE_DT2 | 1l_de-DE_male-DT2/Fenster öffnen.wav | fast_mai,realtime | `Fenster öffnen` |
-| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Diesen%20Sender%20aus%20den%20Favoriten%20l%C3%B6schen.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Diesen Sender aus den Favoriten löschen.wav | realtime | `Diesen Sender aus den Favoriten löschen` |
-| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Linke%20R%C3%BCcksitzbel%C3%BCftung%20auf%20Maximum.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Linke Rücksitzbelüftung auf Maximum.wav | realtime | `Linke Rücksitzbelüftung auf Maximum` |
-
-_(+7 more)_
-
-### Reference too short for audio duration
-
-_(none)_
-
-### All services agree, reference disagrees (likely mislabeled)
-
-#### de-DE_JT1/1l_de-DE_female-JT1/Navigation stummschalten.wav [▶](audio/de-DE_JT1/1l_de-DE_female-JT1/Navigation%20stummschalten.wav.wav) — pairwise WER between services = 0.000
-- ref:           `Navigation stummschalten`
-- fast_default   `Navigation stumm schalten.`
-- fast_llm       `Navigation stumm schalten.`
-- fast_mai       `Navigation stumm schalten.`
-- realtime       `Navigation stumm schalten.`
-- realtime_refine `Navigation stumm schalten`
-
-### Compound-word / segmentation artifacts
-
-#### de-DE_DT1/1l_de-DE_male-DT1/Außenluftzirkulation einschalten.wav [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Au%C3%9Fenluftzirkulation%20einschalten.wav.wav)
-- ref:           `Außenluftzirkulation einschalten`
-- fast_default   `Außenluftzirkulation einschalten.`
-- fast_llm       `Außenluftzirkulation einschalten.`
-- fast_mai       `Außenluft-Zirkulation einschalten.`
-- realtime       `Außenluftzirkulation einschalten.`
-- realtime_refine `Außenluftzirkulation einschalten.`
-
-#### de-DE_JT1/1l_de-DE_male-JT1/Kartenansicht auf 2D einstellen.wav [▶](audio/de-DE_JT1/1l_de-DE_male-JT1/Kartenansicht%20auf%202D%20einstellen.wav.wav)
-- ref:           `Kartenansicht auf 2D einstellen`
-- fast_default   `Kartenansicht auf 2D einstellen`
-- fast_llm       `Kartenansicht auf 2 d einstellen.`
-- fast_mai       `Kartenansicht auf 2D einstellen.`
-- realtime       `Kartenansicht auf 2 D einstellen.`
-- realtime_refine `Kartenansicht auf 2D einstellen`
-
-## Genuine recognition errors (filtered set)
-
-Best / median / worst WER per (dataset, service) on the kept samples.
-
-### de-DE_DT1 / fast_default  (n=20)
+### de-DE_DT1 / fast_default  (n=30)
 **BEST** — `1l_de-DE_male-DT1/Vorherigen Titel abspielen.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Vorherigen%20Titel%20abspielen.wav.wav)  wer=0.000  speech=[1.22s, 3.26s]  fix=none
 - ref: `Vorherigen Titel abspielen`
 - hyp: `vorherigen Titel abspielen`
-**MEDIAN** — `1l_de-DE_male-DT1/Medienlautstärke verringern.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Medienlautst%C3%A4rke%20verringern.wav.wav)  wer=0.500  speech=[1.47s, 3.55s]  fix=none
-- ref: `Medienlautstärke verringern`
-- hyp: `Medienlautstärke verbindet.`
-**WORST** — `1l_de-DE_male-DT1/Wechseln Sie in den detaillierten Berichtsmodus.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Wechseln%20Sie%20in%20den%20detaillierten%20Berichtsmodus.wav.wav)  wer=1.500  speech=[1.29s, 5.52s]  fix=none
-- ref: `Wechseln Sie in den detaillierten Berichtsmodus`
-- hyp: `Next term seat in the induit of Newton believes newer.`
+**MEDIAN** — `1l_de-DE_female-DT1/Linkes Hinterfenster auf 60 % öffnen.wav` [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Linkes%20Hinterfenster%20auf%2060%20%25%20%C3%B6ffnen.wav.wav)  wer=0.600  speech=[3.71s, 5.91s]  fix=none
+- ref: `Linkes Hinterfenster auf 60 % öffnen`
+- hyp: `auf 16% öffnen.`
+**WORST** — `1l_de-DE_male-DT1/Klingelton stummschalten.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Klingelton%20stummschalten.wav.wav)  wer=2.500  speech=[-s, -s]  fix=skip
+- ref: `Klingelton stummschalten`
+- hyp: `Meaning for all its constant.`
 
-### de-DE_DT1 / fast_llm  (n=20)
+### de-DE_DT1 / fast_llm  (n=30)
 **BEST** — `1l_de-DE_male-DT1/Vorherigen Titel abspielen.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Vorherigen%20Titel%20abspielen.wav.wav)  wer=0.000  speech=[1.22s, 3.26s]  fix=none
 - ref: `Vorherigen Titel abspielen`
 - hyp: `Vorherigen Titel abspielen`
-**MEDIAN** — `1l_de-DE_female-DT1/Linkes Hinterfenster auf 60 % öffnen.wav` [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Linkes%20Hinterfenster%20auf%2060%20%25%20%C3%B6ffnen.wav.wav)  wer=0.400  speech=[3.71s, 5.91s]  fix=none
-- ref: `Linkes Hinterfenster auf 60 % öffnen`
-- hyp: `auf 60% öffnen.`
-**WORST** — `1l_de-DE_male-DT1/Medienlautstärke verringern.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Medienlautst%C3%A4rke%20verringern.wav.wav)  wer=2.000  speech=[1.47s, 3.55s]  fix=none
-- ref: `Medienlautstärke verringern`
-- hyp: `Medium loudspeaker and subwoofer.`
+**MEDIAN** — `1l_de-DE_female-DT1/Automatische Belüftung beim Entriegeln aktivieren.wav` [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20aktivieren.wav.wav)  wer=0.600  speech=[-s, -s]  fix=skip
+- ref: `Automatische Belüftung beim Entriegeln aktivieren`
+- hyp: `Automatische Umlüftung bei Entgegen aktivieren.`
+**WORST** — `1l_de-DE_male-DT1/Klingelton stummschalten.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Klingelton%20stummschalten.wav.wav)  wer=2.500  speech=[-s, -s]  fix=skip
+- ref: `Klingelton stummschalten`
+- hyp: `Ring it for all expenses.`
 
-### de-DE_DT1 / fast_mai  (n=20)
+### de-DE_DT1 / fast_mai  (n=30)
 **BEST** — `1l_de-DE_female-DT1/Autofenster halb öffnen.wav` [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Autofenster%20halb%20%C3%B6ffnen.wav.wav)  wer=0.000  speech=[1.78s, 3.46s]  fix=none
 - ref: `Autofenster halb öffnen`
 - hyp: `Autofenster halb öffnen.`
-**MEDIAN** — `1l_de-DE_male-DT1/Kartenansicht auf 2D einstellen.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Kartenansicht%20auf%202D%20einstellen.wav.wav)  wer=0.250  speech=[1.19s, 3.63s]  fix=trim_last
-- ref: `Kartenansicht auf 2D einstellen`
-- hyp: `Atemansicht auf 2D einstellen.`
-**WORST** — `1l_de-DE_female-DT1/Diesen Sender aus den Favoriten löschen.wav` [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Diesen%20Sender%20aus%20den%20Favoriten%20l%C3%B6schen.wav.wav)  wer=1.000  speech=[3.6s, 4.32s]  fix=trim_first
-- ref: `Diesen Sender aus den Favoriten löschen`
-- hyp: `Aber wie findet der hinzufügen?`
+**MEDIAN** — `1l_de-DE_female-DT1/Fahrtenanzeige öffnen.wav` [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Fahrtenanzeige%20%C3%B6ffnen.wav.wav)  wer=0.500  speech=[1.95s, 3.07s]  fix=trim_first
+- ref: `Fahrtenanzeige öffnen`
+- hyp: `Datenanzeige öffnen.`
+**WORST** — `1l_de-DE_male-DT1/Klingelton stummschalten.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Klingelton%20stummschalten.wav.wav)  wer=3.000  speech=[-s, -s]  fix=skip
+- ref: `Klingelton stummschalten`
+- hyp: `Länge vor uns können es sein.`
 
-### de-DE_DT1 / realtime  (n=20)
+### de-DE_DT1 / realtime  (n=30)
 **BEST** — `1l_de-DE_male-DT1/Vorherigen Titel abspielen.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Vorherigen%20Titel%20abspielen.wav.wav)  wer=0.000  speech=[1.22s, 3.26s]  fix=none
 - ref: `Vorherigen Titel abspielen`
 - hyp: `Vorherigen Titel abspielen.`
-**MEDIAN** — `1l_de-DE_female-DT1/Linkes Hinterfenster auf 60 % öffnen.wav` [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Linkes%20Hinterfenster%20auf%2060%20%25%20%C3%B6ffnen.wav.wav)  wer=0.400  speech=[3.71s, 5.91s]  fix=none
-- ref: `Linkes Hinterfenster auf 60 % öffnen`
-- hyp: `Hinterpanzer auf 60% öffnen.`
-**WORST** — `1l_de-DE_female-DT1/Diesen Sender aus den Favoriten löschen.wav` [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Diesen%20Sender%20aus%20den%20Favoriten%20l%C3%B6schen.wav.wav)  wer=1.000  speech=[3.6s, 4.32s]  fix=trim_first
-- ref: `Diesen Sender aus den Favoriten löschen`
-- hyp: `Favoritenliste hinzufügen.`
-
-### de-DE_DT1 / realtime_refine  (n=20)
-**BEST** — `1l_de-DE_male-DT1/Vorherigen Titel abspielen.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Vorherigen%20Titel%20abspielen.wav.wav)  wer=0.000  speech=[1.22s, 3.26s]  fix=none
-- ref: `Vorherigen Titel abspielen`
-- hyp: `Vorherigen Titel abspielen.`
-**MEDIAN** — `1l_de-DE_male-DT1/Kartenansicht auf 2D einstellen.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Kartenansicht%20auf%202D%20einstellen.wav.wav)  wer=0.500  speech=[1.19s, 3.63s]  fix=trim_last
-- ref: `Kartenansicht auf 2D einstellen`
-- hyp: `Datenansicht auf 2W einstellen.`
-**WORST** — `1l_de-DE_male-DT1/Automatische Belüftung beim Entriegeln deaktivieren.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20deaktivieren.wav.wav)  wer=1.400  speech=[-s, -s]  fix=skip
+**MEDIAN** — `1l_de-DE_female-DT1/Automatische Belüftung beim Entriegeln deaktivieren.wav` [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20deaktivieren.wav.wav)  wer=0.600  speech=[-s, -s]  fix=skip
 - ref: `Automatische Belüftung beim Entriegeln deaktivieren`
-- hyp: `Altamonte served neutral by Centenegio, the electron.`
+- hyp: `Automatische Belastung bei den Deaktivieren.`
+**WORST** — `1l_de-DE_male-DT1/Klingelton stummschalten.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Klingelton%20stummschalten.wav.wav)  wer=1.000  speech=[-s, -s]  fix=skip
+- ref: `Klingelton stummschalten`
+- hyp: ``
 
-### de-DE_DT2 / fast_default  (n=13)
+### de-DE_DT1 / realtime_refine  (n=30)
+**BEST** — `1l_de-DE_male-DT1/Vorherigen Titel abspielen.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Vorherigen%20Titel%20abspielen.wav.wav)  wer=0.000  speech=[1.22s, 3.26s]  fix=none
+- ref: `Vorherigen Titel abspielen`
+- hyp: `Vorherigen Titel abspielen.`
+**MEDIAN** — `1l_de-DE_male-DT1/Scheinwerferhöhe auf mittel stellen.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Scheinwerferh%C3%B6he%20auf%20mittel%20stellen.wav.wav)  wer=0.500  speech=[1.22s, 3.82s]  fix=none
+- ref: `Scheinwerferhöhe auf mittel stellen`
+- hyp: `Scheinwerferhöhe auf Mittelstand`
+**WORST** — `1l_de-DE_male-DT1/Klingelton stummschalten.wav` [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Klingelton%20stummschalten.wav.wav)  wer=3.000  speech=[-s, -s]  fix=skip
+- ref: `Klingelton stummschalten`
+- hyp: `being it for all its constant.`
+
+### de-DE_DT2 / fast_default  (n=30)
 **BEST** — `1l_de-DE_male-DT2/Vorherigen Titel abspielen.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Vorherigen%20Titel%20abspielen.wav.wav)  wer=0.000  speech=[1.27s, 3.23s]  fix=none
 - ref: `Vorherigen Titel abspielen`
 - hyp: `Vorherigen Titel abspielen.`
-**MEDIAN** — `1l_de-DE_male-DT2/Öffne das Fenster in der ersten Reihe.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/%C3%96ffne%20das%20Fenster%20in%20der%20ersten%20Reihe.wav.wav)  wer=0.286  speech=[1.34s, 3.86s]  fix=none
-- ref: `Öffne das Fenster in der ersten Reihe`
-- hyp: `Öffne das Fenster in den ersten Ball.`
-**WORST** — `1l_de-DE_female-DT2/Automatische Belüftung beim Entriegeln aktivieren.wav` [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20aktivieren.wav.wav)  wer=1.600  speech=[3.15s, 5.75s]  fix=none
-- ref: `Automatische Belüftung beim Entriegeln aktivieren`
-- hyp: `A particular delivery plan to need an antiviral.`
+**MEDIAN** — `1l_de-DE_female-DT2/Lüfter um 1 Stufe erhöhen.wav` [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/L%C3%BCfter%20um%201%20Stufe%20erh%C3%B6hen.wav.wav)  wer=1.000  speech=[-s, -s]  fix=skip
+- ref: `Lüfter um 1 Stufe erhöhen`
+- hyp: ``
+**WORST** — `1l_de-DE_female-DT2/Navigation stummschalten.wav` [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Navigation%20stummschalten.wav.wav)  wer=3.000  speech=[-s, -s]  fix=skip
+- ref: `Navigation stummschalten`
+- hyp: `Now that's certain by me.`
 
-### de-DE_DT2 / fast_llm  (n=13)
+### de-DE_DT2 / fast_llm  (n=30)
 **BEST** — `1l_de-DE_male-DT2/Vorherigen Titel abspielen.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Vorherigen%20Titel%20abspielen.wav.wav)  wer=0.000  speech=[1.27s, 3.23s]  fix=none
 - ref: `Vorherigen Titel abspielen`
 - hyp: `Vorherigen Titel abspielen.`
-**MEDIAN** — `1l_de-DE_male-DT2/Öffne das Fenster in der ersten Reihe.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/%C3%96ffne%20das%20Fenster%20in%20der%20ersten%20Reihe.wav.wav)  wer=0.143  speech=[1.34s, 3.86s]  fix=none
-- ref: `Öffne das Fenster in der ersten Reihe`
-- hyp: `Öffne das Fenster in der ersten Wahl.`
-**WORST** — `1l_de-DE_female-DT2/Automatische Belüftung beim Entriegeln aktivieren.wav` [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20aktivieren.wav.wav)  wer=1.400  speech=[3.15s, 5.75s]  fix=none
-- ref: `Automatische Belüftung beim Entriegeln aktivieren`
-- hyp: `Automatische Belüftung bei einem Unimog A 4 B L.`
+**MEDIAN** — `1l_de-DE_female-DT2/Fahren Sie nach Birmingham.wav` [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Fahren%20Sie%20nach%20Birmingham.wav.wav)  wer=1.000  speech=[-s, -s]  fix=skip
+- ref: `Fahren Sie nach Birmingham`
+- hyp: `I think.`
+**WORST** — `1l_de-DE_female-DT2/Linke Rücksitzbelüftung leicht erhöhen.wav` [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Linke%20R%C3%BCcksitzbel%C3%BCftung%20leicht%20erh%C3%B6hen.wav.wav)  wer=3.500  speech=[-s, -s]  fix=skip
+- ref: `Linke Rücksitzbelüftung leicht erhöhen`
+- hyp: `The last appearance of the character was in the 2000 issue of the series.`
 
-### de-DE_DT2 / fast_mai  (n=13)
+### de-DE_DT2 / fast_mai  (n=30)
 **BEST** — `1l_de-DE_male-DT2/Vorderen Bereich etwas erwärmen.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Vorderen%20Bereich%20etwas%20erw%C3%A4rmen.wav.wav)  wer=0.000  speech=[1.35s, 3.67s]  fix=none
 - ref: `Vorderen Bereich etwas erwärmen`
 - hyp: `vorderen Bereich etwas erwärmen.`
-**MEDIAN** — `1l_de-DE_male-DT2/Automatische Belüftung beim Entriegeln deaktivieren.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20deaktivieren.wav.wav)  wer=0.200  speech=[1.48s, 5.4s]  fix=none
-- ref: `Automatische Belüftung beim Entriegeln deaktivieren`
-- hyp: `Automatische Belüftung beim Riegeln deaktivieren.`
-**WORST** — `1l_de-DE_male-DT2/Scheinwerfer auf dritte Stufe einstellen.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Scheinwerfer%20auf%20dritte%20Stufe%20einstellen.wav.wav)  wer=0.600  speech=[-s, -s]  fix=skip
+**MEDIAN** — `1l_de-DE_male-DT2/Scheinwerfer auf dritte Stufe einstellen.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Scheinwerfer%20auf%20dritte%20Stufe%20einstellen.wav.wav)  wer=0.600  speech=[-s, -s]  fix=skip
 - ref: `Scheinwerfer auf dritte Stufe einstellen`
 - hyp: `Steinwerfer auf Mittelstufe einstellen.`
+**WORST** — `1l_de-DE_female-DT2/Navigation stummschalten.wav` [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Navigation%20stummschalten.wav.wav)  wer=3.500  speech=[-s, -s]  fix=skip
+- ref: `Navigation stummschalten`
+- hyp: `Ich glaube, das sollten wir bei uns`
 
-### de-DE_DT2 / realtime  (n=13)
+### de-DE_DT2 / realtime  (n=30)
 **BEST** — `1l_de-DE_male-DT2/Vorherigen Titel abspielen.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Vorherigen%20Titel%20abspielen.wav.wav)  wer=0.000  speech=[1.27s, 3.23s]  fix=none
 - ref: `Vorherigen Titel abspielen`
 - hyp: `Vorherigen Titel abspielen.`
-**MEDIAN** — `1l_de-DE_female-DT2/Automatische Belüftung beim Entriegeln aktivieren.wav` [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20aktivieren.wav.wav)  wer=0.400  speech=[3.15s, 5.75s]  fix=none
-- ref: `Automatische Belüftung beim Entriegeln aktivieren`
-- hyp: `Automatische Belüftung aktivieren.`
-**WORST** — `1l_de-DE_male-DT2/Kartenansicht auf 2D einstellen.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Kartenansicht%20auf%202D%20einstellen.wav.wav)  wer=0.750  speech=[2.47s, 4.35s]  fix=trim_first
-- ref: `Kartenansicht auf 2D einstellen`
-- hyp: `Datenansicht auf 2 d einstellen.`
+**MEDIAN** — `1l_de-DE_female-DT2/Autofenster halb öffnen.wav` [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Autofenster%20halb%20%C3%B6ffnen.wav.wav)  wer=1.000  speech=[-s, -s]  fix=skip
+- ref: `Autofenster halb öffnen`
+- hyp: ``
+**WORST** — `1l_de-DE_female-DT2/Linke Rücksitzbelüftung auf Minimum.wav` [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Linke%20R%C3%BCcksitzbel%C3%BCftung%20auf%20Minimum.wav.wav)  wer=1.000  speech=[-s, -s]  fix=skip
+- ref: `Linke Rücksitzbelüftung auf Minimum`
+- hyp: ``
 
-### de-DE_DT2 / realtime_refine  (n=13)
+### de-DE_DT2 / realtime_refine  (n=30)
 **BEST** — `1l_de-DE_male-DT2/Vorherigen Titel abspielen.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Vorherigen%20Titel%20abspielen.wav.wav)  wer=0.000  speech=[1.27s, 3.23s]  fix=none
 - ref: `Vorherigen Titel abspielen`
 - hyp: `Vorherigen Titel abspielen.`
-**MEDIAN** — `1l_de-DE_male-DT2/Öffne das Fenster in der ersten Reihe.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/%C3%96ffne%20das%20Fenster%20in%20der%20ersten%20Reihe.wav.wav)  wer=0.286  speech=[1.34s, 3.86s]  fix=none
-- ref: `Öffne das Fenster in der ersten Reihe`
-- hyp: `Öffne das Fenster in den ersten Ball.`
-**WORST** — `1l_de-DE_male-DT2/Scheinwerfer auf dritte Stufe einstellen.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Scheinwerfer%20auf%20dritte%20Stufe%20einstellen.wav.wav)  wer=0.800  speech=[-s, -s]  fix=skip
-- ref: `Scheinwerfer auf dritte Stufe einstellen`
-- hyp: `Scheinwerfer Mittelstufe einschalten.`
+**MEDIAN** — `1l_de-DE_female-DT2/Linkes Hinterfenster auf 60 % öffnen.wav` [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Linkes%20Hinterfenster%20auf%2060%20%25%20%C3%B6ffnen.wav.wav)  wer=0.800  speech=[-s, -s]  fix=skip
+- ref: `Linkes Hinterfenster auf 60 % öffnen`
+- hyp: `Auf 60 Prozent signieren.`
+**WORST** — `1l_de-DE_male-DT2/Autofenster halb öffnen.wav` [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Autofenster%20halb%20%C3%B6ffnen.wav.wav)  wer=2.000  speech=[-s, -s]  fix=skip
+- ref: `Autofenster halb öffnen`
+- hyp: `How could pet start IPS?Okay.`
 
-### de-DE_JT1 / fast_default  (n=27)
+### de-DE_JT1 / fast_default  (n=30)
 **BEST** — `1l_de-DE_male-JT1/Scheinwerfer auf dritte Stufe einstellen.wav` [▶](audio/de-DE_JT1/1l_de-DE_male-JT1/Scheinwerfer%20auf%20dritte%20Stufe%20einstellen.wav.wav)  wer=0.000  speech=[1.59s, 4.67s]  fix=none
 - ref: `Scheinwerfer auf dritte Stufe einstellen`
 - hyp: `Scheinwerfer auf dritte Stufe einstellen`
@@ -257,7 +161,7 @@ Best / median / worst WER per (dataset, service) on the kept samples.
 - ref: `Diesen Sender aus den Favoriten löschen`
 - hyp: `Favoritenliste hinzufügen.`
 
-### de-DE_JT1 / fast_llm  (n=27)
+### de-DE_JT1 / fast_llm  (n=30)
 **BEST** — `1l_de-DE_male-JT1/Scheinwerfer auf dritte Stufe einstellen.wav` [▶](audio/de-DE_JT1/1l_de-DE_male-JT1/Scheinwerfer%20auf%20dritte%20Stufe%20einstellen.wav.wav)  wer=0.000  speech=[1.59s, 4.67s]  fix=none
 - ref: `Scheinwerfer auf dritte Stufe einstellen`
 - hyp: `Scheinwerfer auf dritte Stufe einstellen`
@@ -268,7 +172,7 @@ Best / median / worst WER per (dataset, service) on the kept samples.
 - ref: `Fahren Sie nach Birmingham`
 - hyp: `Find the app for him.`
 
-### de-DE_JT1 / fast_mai  (n=27)
+### de-DE_JT1 / fast_mai  (n=30)
 **BEST** — `1l_de-DE_male-JT1/Scheinwerfer auf dritte Stufe einstellen.wav` [▶](audio/de-DE_JT1/1l_de-DE_male-JT1/Scheinwerfer%20auf%20dritte%20Stufe%20einstellen.wav.wav)  wer=0.000  speech=[1.59s, 4.67s]  fix=none
 - ref: `Scheinwerfer auf dritte Stufe einstellen`
 - hyp: `Scheinwerfer auf dritte Stufe einstellen.`
@@ -279,7 +183,7 @@ Best / median / worst WER per (dataset, service) on the kept samples.
 - ref: `Diesen Sender aus den Favoriten löschen`
 - hyp: `zur Favoritenliste hinzufügen.`
 
-### de-DE_JT1 / realtime  (n=27)
+### de-DE_JT1 / realtime  (n=30)
 **BEST** — `1l_de-DE_male-JT1/Scheinwerfer auf dritte Stufe einstellen.wav` [▶](audio/de-DE_JT1/1l_de-DE_male-JT1/Scheinwerfer%20auf%20dritte%20Stufe%20einstellen.wav.wav)  wer=0.000  speech=[1.59s, 4.67s]  fix=none
 - ref: `Scheinwerfer auf dritte Stufe einstellen`
 - hyp: `Scheinwerfer auf dritte Stufe einstellen.`
@@ -290,7 +194,7 @@ Best / median / worst WER per (dataset, service) on the kept samples.
 - ref: `Diesen Sender aus den Favoriten löschen`
 - hyp: `Favoritenliste hinzufügen.`
 
-### de-DE_JT1 / realtime_refine  (n=27)
+### de-DE_JT1 / realtime_refine  (n=30)
 **BEST** — `1l_de-DE_male-JT1/Scheinwerfer auf dritte Stufe einstellen.wav` [▶](audio/de-DE_JT1/1l_de-DE_male-JT1/Scheinwerfer%20auf%20dritte%20Stufe%20einstellen.wav.wav)  wer=0.000  speech=[1.59s, 4.67s]  fix=none
 - ref: `Scheinwerfer auf dritte Stufe einstellen`
 - hyp: `Scheinwerfer auf dritte Stufe einstellen`
@@ -301,7 +205,43 @@ Best / median / worst WER per (dataset, service) on the kept samples.
 - ref: `Diesen Sender aus den Favoriten löschen`
 - hyp: `zur Favoritenliste hinzufügen`
 
-## Top fast_default vs realtime disagreements (filtered)
+## fast_llm hallucinations
+
+`fast_llm` does not set a locale — it relies on auto-detection. When the acoustic signal is weak or ambiguous, it may produce text in the wrong language or fabricate content from its training data.
+
+Found **27** likely hallucinations (WER ≥ 0.8 and ≤ 1 word overlap with reference):
+
+| Audio | Dataset | Sample | WER | Boundary | Reference | Hypothesis |
+|---|---|---|---:|---|---|---|
+| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20deaktivieren.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Automatische Belüftung beim Entriegeln deaktivieren.wav | 2.000 | skip | `Automatische Belüftung beim Entriegeln deaktivieren` | `Smart trip planner by Nitin P. A. P. V. A.` |
+| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Die%20letzte.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Die letzte.wav | 1.500 | none | `Die letzte` | `He left the...` |
+| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Diesen%20Sender%20aus%20den%20Favoriten%20l%C3%B6schen.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Diesen Sender aus den Favoriten löschen.wav | 1.000 | trim_first | `Diesen Sender aus den Favoriten löschen` | `Favoreció un despeje en su espíritu.` |
+| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Eco-Fahrmodus%20aktivieren.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Eco-Fahrmodus aktivieren.wav | 2.000 | skip | `Eco-Fahrmodus aktivieren` | `Est-ce que tu es un?` |
+| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Fahren%20Sie%20nach%20Birmingham.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Fahren Sie nach Birmingham.wav | 1.000 | skip | `Fahren Sie nach Birmingham` | `And.` |
+| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Kannst%20du%20die%20Lautst%C3%A4rke%20auf%20das%20Minimum%20einstellen.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Kannst du die Lautstärke auf das Minimum einstellen.wav | 0.875 | skip | `Kannst du die Lautstärke auf das Minimum einstellen` | `The large check off minimum action.` |
+| [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Linke%20R%C3%BCcksitzbel%C3%BCftung%20leicht%20erh%C3%B6hen.wav.wav) | de-DE_DT1 | 1l_de-DE_female-DT1/Linke Rücksitzbelüftung leicht erhöhen.wav | 1.000 | skip | `Linke Rücksitzbelüftung leicht erhöhen` | `Last week.` |
+| [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20deaktivieren.wav.wav) | de-DE_DT1 | 1l_de-DE_male-DT1/Automatische Belüftung beim Entriegeln deaktivieren.wav | 1.200 | skip | `Automatische Belüftung beim Entriegeln deaktivieren` | `Automatischer Refill bei San Diego, Elias.` |
+| [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Klingelton%20stummschalten.wav.wav) | de-DE_DT1 | 1l_de-DE_male-DT1/Klingelton stummschalten.wav | 2.500 | skip | `Klingelton stummschalten` | `Ring it for all expenses.` |
+| [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Medienlautst%C3%A4rke%20verringern.wav.wav) | de-DE_DT1 | 1l_de-DE_male-DT1/Medienlautstärke verringern.wav | 2.000 | none | `Medienlautstärke verringern` | `Medium loudspeaker and subwoofer.` |
+| [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Vorderen%20Bereich%20etwas%20erw%C3%A4rmen.wav.wav) | de-DE_DT1 | 1l_de-DE_male-DT1/Vorderen Bereich etwas erwärmen.wav | 1.250 | skip | `Vorderen Bereich etwas erwärmen` | `What are the nearby restaurants?` |
+| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Autofenster%20halb%20%C3%B6ffnen.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Autofenster halb öffnen.wav | 1.000 | skip | `Autofenster halb öffnen` | `How to answer?` |
+| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20deaktivieren.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Automatische Belüftung beim Entriegeln deaktivieren.wav | 1.800 | skip | `Automatische Belüftung beim Entriegeln deaktivieren` | `Not sure if a little bit of anything, the.` |
+| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Die%20letzte.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Die letzte.wav | 1.000 | skip | `Die letzte` | `No.` |
+| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Diesen%20Sender%20aus%20den%20Favoriten%20l%C3%B6schen.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Diesen Sender aus den Favoriten löschen.wav | 1.000 | skip | `Diesen Sender aus den Favoriten löschen` | `And that's a problem.` |
+| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Eco-Fahrmodus%20aktivieren.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Eco-Fahrmodus aktivieren.wav | 1.000 | skip | `Eco-Fahrmodus aktivieren` | `Yeah.` |
+| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Fahren%20Sie%20nach%20Birmingham.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Fahren Sie nach Birmingham.wav | 1.000 | skip | `Fahren Sie nach Birmingham` | `I think.` |
+| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Linke%20R%C3%BCcksitzbel%C3%BCftung%20leicht%20erh%C3%B6hen.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Linke Rücksitzbelüftung leicht erhöhen.wav | 3.500 | skip | `Linke Rücksitzbelüftung leicht erhöhen` | `The last appearance of the character was in the 2000 issue of the series.` |
+| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Linkes%20Hinterfenster%20auf%2060%20%25%20%C3%B6ffnen.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Linkes Hinterfenster auf 60 % öffnen.wav | 1.200 | skip | `Linkes Hinterfenster auf 60 % öffnen` | `OK, so thank you for that.` |
+| [▶](audio/de-DE_DT2/1l_de-DE_female-DT2/Navigation%20stummschalten.wav.wav) | de-DE_DT2 | 1l_de-DE_female-DT2/Navigation stummschalten.wav | 3.000 | skip | `Navigation stummschalten` | `Love that's there to buy.` |
+| [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Autofenster%20halb%20%C3%B6ffnen.wav.wav) | de-DE_DT2 | 1l_de-DE_male-DT2/Autofenster halb öffnen.wav | 1.000 | skip | `Autofenster halb öffnen` | `Open.` |
+| [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Fenster%20%C3%B6ffnen.wav.wav) | de-DE_DT2 | 1l_de-DE_male-DT2/Fenster öffnen.wav | 1.000 | skip | `Fenster öffnen` | `Thanks, guys.` |
+| [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Scheinwerfer%20auf%20dritte%20Stufe%20einstellen.wav.wav) | de-DE_DT2 | 1l_de-DE_male-DT2/Scheinwerfer auf dritte Stufe einstellen.wav | 0.800 | skip | `Scheinwerfer auf dritte Stufe einstellen` | `Einwerfer Mittelstufe einstellen.` |
+| [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Scheinwerferh%C3%B6he%20auf%20mittel%20stellen.wav.wav) | de-DE_DT2 | 1l_de-DE_male-DT2/Scheinwerferhöhe auf mittel stellen.wav | 1.500 | skip | `Scheinwerferhöhe auf mittel stellen` | `Science and Technology has made it.` |
+| [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Wechseln%20Sie%20in%20den%20detaillierten%20Berichtsmodus.wav.wav) | de-DE_DT2 | 1l_de-DE_male-DT2/Wechseln Sie in den detaillierten Berichtsmodus.wav | 1.000 | skip | `Wechseln Sie in den detaillierten Berichtsmodus` | `Excellent!` |
+| [▶](audio/de-DE_JT1/1l_de-DE_female-JT1/Diesen%20Sender%20aus%20den%20Favoriten%20l%C3%B6schen.wav.wav) | de-DE_JT1 | 1l_de-DE_female-JT1/Diesen Sender aus den Favoriten löschen.wav | 1.000 | trim_first | `Diesen Sender aus den Favoriten löschen` | `Favoritenliste hinzufügen.` |
+| [▶](audio/de-DE_JT1/1l_de-DE_female-JT1/Fahren%20Sie%20nach%20Birmingham.wav.wav) | de-DE_JT1 | 1l_de-DE_female-JT1/Fahren Sie nach Birmingham.wav | 1.250 | none | `Fahren Sie nach Birmingham` | `Find the app for him.` |
+
+## Top fast_default vs realtime disagreements
 
 ### de-DE_DT1/1l_de-DE_male-DT1/Wechseln Sie in den detaillierten Berichtsmodus.wav [▶](audio/de-DE_DT1/1l_de-DE_male-DT1/Wechseln%20Sie%20in%20den%20detaillierten%20Berichtsmodus.wav.wav)  Δwer=0.667  (fast_default=1.000, realtime=0.333)  speech=[1.29s, 5.52s] fix=none
 - ref:           `Wechseln Sie in den detaillierten Berichtsmodus`
@@ -367,24 +307,23 @@ Best / median / worst WER per (dataset, service) on the kept samples.
 - realtime       `Automatische Belüftung.`
 - realtime_refine `Altamonte served neutral by Centenegio, the electron.`
 
-### de-DE_JT1/1l_de-DE_female-JT1/Kannst du die Lautstärke auf das Minimum einstellen.wav [▶](audio/de-DE_JT1/1l_de-DE_female-JT1/Kannst%20du%20die%20Lautst%C3%A4rke%20auf%20das%20Minimum%20einstellen.wav.wav)  Δwer=0.375  (fast_default=0.875, realtime=0.500)  speech=[2.76s, 4.72s] fix=none
-- ref:           `Kannst du die Lautstärke auf das Minimum einstellen`
-- fast_default   `Don't check out this minimum einstein.`
-- fast_llm       `Lautstärke auf das Minimum einstellen.`
-- fast_mai       `Die Lautstärke auf das Minimum einstellen.`
-- realtime       `Da steht auf das Minimum einstellen.`
-- realtime_refine `Lautstärke auf das Minimum einstellen`
+### de-DE_DT1/1l_de-DE_female-DT1/Automatische Belüftung beim Entriegeln deaktivieren.wav [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20deaktivieren.wav.wav)  Δwer=0.400  (fast_default=1.000, realtime=0.600)  speech=[-s, -s] fix=skip
+- ref:           `Automatische Belüftung beim Entriegeln deaktivieren`
+- fast_default   ``
+- fast_llm       `Smart trip planner by Nitin P. A. P. V. A.`
+- fast_mai       `Automatische Belüftung bei Enten, Gänse und wie auch immer.`
+- realtime       `Automatische Belastung bei den Deaktivieren.`
+- realtime_refine `Automatische Belüftung bei den Dingern deaktivieren.`
 
-### de-DE_JT1/1l_de-DE_male-JT1/Vorherigen Titel abspielen.wav [▶](audio/de-DE_JT1/1l_de-DE_male-JT1/Vorherigen%20Titel%20abspielen.wav.wav)  Δwer=0.333  (fast_default=0.000, realtime=0.333)  speech=[1.22s, 3.08s] fix=trim_last
-- ref:           `Vorherigen Titel abspielen`
-- fast_default   `Vorherigen Titel abspielen.`
-- fast_llm       `Vorherigen Titel abspielen`
-- fast_mai       `Vorherigen Titel abspielen.`
-- realtime       `Vorherigen Titel abspielen.Können.`
-- realtime_refine `vorherigen Titel abspielen`
+### de-DE_DT1/1l_de-DE_female-DT1/Automatische Belüftung beim Entriegeln aktivieren.wav [▶](audio/de-DE_DT1/1l_de-DE_female-DT1/Automatische%20Bel%C3%BCftung%20beim%20Entriegeln%20aktivieren.wav.wav)  Δwer=0.400  (fast_default=0.600, realtime=1.000)  speech=[-s, -s] fix=skip
+- ref:           `Automatische Belüftung beim Entriegeln aktivieren`
+- fast_default   `Automatische Beliftung bei Enreaging aktivieren.`
+- fast_llm       `Automatische Umlüftung bei Entgegen aktivieren.`
+- fast_mai       `Automatische Vernetzung der Entwederung aktivieren`
+- realtime       ``
+- realtime_refine `Automatische Belüftung bei Entregeln aktivieren.`
 
 ## Caveats
 
 - **UPL is anchored on the realtime SDK's word-end timestamp** for each sample, so all services use the same `speech_end`. The CSV's `upl_self_ms` column has each service's own phrase-derived value if you want to see how its boundary detection differs.
 - **Mazda voice commands** are short utterances (typically 2-8 words). WER on short references is noisier — a single word error on a 3-word command gives 33% WER.
-- The 'all-agree-vs-ref' filter is conservative (pairwise WER < 0.15 AND mean ref WER > 0.5). True mislabels with partial agreement still survive and inflate per-service WER equally.

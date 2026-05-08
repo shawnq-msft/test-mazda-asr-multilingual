@@ -1,14 +1,7 @@
-"""Error analysis: exclude data-issue rows from the full benchmark CSV.
+"""Error analysis companion to the benchmark report.
 
-Exclusion rules:
-  1. Empty hypothesis from any service for a (dataset, sample_id).
-  2. Reference much shorter than audio (likely truncated/wrong label).
-  3. All services agree (low mutual WER) but disagree with reference
-     (likely mislabeled ground truth).
-
-For every excluded or highlighted sample we additionally write a 16-kHz mono
-PCM16 WAV under `results/audio/<dataset>/<sample_id>.wav` (idempotent) so a
-reviewer can play the clip.
+Lists best/median/worst per (dataset, service), fast_llm hallucinations,
+top fast_default vs realtime disagreements, with [▶] audio links.
 """
 from __future__ import annotations
 
@@ -16,7 +9,6 @@ import csv
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
-from statistics import mean
 from urllib.parse import quote
 
 from rapidfuzz.distance import Levenshtein
@@ -112,90 +104,20 @@ def main(csv_path: Path, out_path: Path) -> None:
     for r in rows:
         by_sample[(r["dataset"], r["sample_id"])][r["service"]] = r
 
-    excluded_empty: list[tuple[str, str, str]] = []
-    excluded_short_ref: list[tuple[str, str, float, str]] = []
-    excluded_mislabel: list[tuple[str, str, float, str, dict]] = []
-    excluded_compound: list[tuple[str, str, str, dict]] = []
-
-    keep: set[tuple[str, str]] = set()
-
-    for key, svcmap in by_sample.items():
-        ds, sid = key
-        present = [s for s in SERVICES if s in svcmap]
-        if len(present) < 2:
-            continue
-
-        empties = [s for s in present
-                   if not (svcmap[s].get("hypothesis") or "").strip()
-                   and not svcmap[s].get("error")]
-        if empties:
-            excluded_empty.append((ds, sid, ",".join(empties)))
-            continue
-        if any(svcmap[s].get("error") for s in present):
-            excluded_empty.append((ds, sid, "error:" + ",".join(
-                s for s in present if svcmap[s].get("error"))))
-            continue
-
-        ref = svcmap[present[0]].get("reference", "") or ""
-        ref_words = normalize_text(ref).split()
-        try:
-            dur_s = float(svcmap[present[0]].get("duration_s") or 0.0)
-        except ValueError:
-            dur_s = 0.0
-        words_per_s = (len(ref_words) / dur_s) if dur_s > 0 else 0.0
-        if dur_s >= 1.0 and words_per_s < 0.3:
-            excluded_short_ref.append((ds, sid, words_per_s, ref))
-            continue
-
-        hyps = {s: svcmap[s].get("hypothesis", "") or "" for s in present}
-        pairwise: list[float] = []
-        svc_list = list(present)
-        for i in range(len(svc_list)):
-            for j in range(i + 1, len(svc_list)):
-                pairwise.append(wer_calc(hyps[svc_list[i]], hyps[svc_list[j]]))
-        mean_agree_wer = mean(pairwise) if pairwise else 1.0
-        mean_ref_wer = mean(wer_calc(ref, hyps[s]) for s in present)
-        if mean_agree_wer < 0.15 and mean_ref_wer > 0.5:
-            excluded_mislabel.append((ds, sid, mean_agree_wer, ref, hyps))
-            continue
-
-        ref_joined = normalize_text(ref).replace(" ", "")
-        all_compound = all(
-            normalize_text(hyps[s]).replace(" ", "") == ref_joined
-            for s in present
-        )
-        if all_compound and mean_ref_wer > 0:
-            excluded_compound.append((ds, sid, ref, hyps))
-            continue
-
-        keep.add(key)
-
-    by_key_filtered: dict[tuple[str, str], list[dict]] = defaultdict(list)
-    by_key_all: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    by_key: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for r in rows:
-        ksamp = (r["dataset"], r["sample_id"])
-        by_key_all[(r["dataset"], r["service"])].append(r)
-        if ksamp in keep:
-            by_key_filtered[(r["dataset"], r["service"])].append(r)
+        by_key[(r["dataset"], r["service"])].append(r)
 
-    # Determine which sample ids will appear in the report so we only re-load those.
+    # Collect sample IDs needed for audio links
     needed: set[tuple[str, str]] = set()
-    for ds, sid, _ in excluded_empty:
-        needed.add((ds, sid))
-    for ds, sid, _, _ in excluded_short_ref:
-        needed.add((ds, sid))
-    for ds, sid, _, _, _ in excluded_mislabel:
-        needed.add((ds, sid))
-    for ds, sid, _, _ in excluded_compound:
-        needed.add((ds, sid))
 
-    by_pair_filtered_for_needed: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    # Best/median/worst per (dataset, service)
+    by_pair: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for r in rows:
-        ksamp = (r["dataset"], r["sample_id"])
-        if ksamp not in keep or r["error"] or r["wer"] == "":
+        if r["error"] or r["wer"] == "":
             continue
-        by_pair_filtered_for_needed[(r["dataset"], r["service"])].append(r)
-    for (ds, _svc), rs in by_pair_filtered_for_needed.items():
+        by_pair[(r["dataset"], r["service"])].append(r)
+    for (ds, _svc), rs in by_pair.items():
         if not rs:
             continue
         rs_sorted = sorted(rs, key=lambda r: float(r["wer"]))
@@ -203,8 +125,9 @@ def main(csv_path: Path, out_path: Path) -> None:
             needed.add((ds, r["sample_id"]))
 
     # Top fast_default vs realtime disagreements
+    all_keys = set(by_sample.keys())
     top_diffs: list = []
-    for key in keep:
+    for key in all_keys:
         ds, sid = key
         svcmap = by_sample[key]
         if "fast_default" in svcmap and "realtime" in svcmap:
@@ -217,6 +140,31 @@ def main(csv_path: Path, out_path: Path) -> None:
     top_diffs.sort(reverse=True)
     for _, ds, sid, _, _, _ in top_diffs[:10]:
         needed.add((ds, sid))
+
+    # fast_llm hallucinations
+    hallucinations: list[tuple[str, str, str, str, str, str]] = []
+    for r in rows:
+        if r["service"] != "fast_llm" or r.get("error") or r["wer"] == "":
+            continue
+        wer_val = float(r["wer"])
+        if wer_val < 0.8:
+            continue
+        ref = r.get("reference", "") or ""
+        hyp = r.get("hypothesis", "") or ""
+        if not ref or not hyp:
+            continue
+        ref_norm = normalize_text(ref)
+        hyp_norm = normalize_text(hyp)
+        ref_words = set(ref_norm.split())
+        hyp_words = set(hyp_norm.split())
+        overlap = len(ref_words & hyp_words)
+        if overlap <= 1:
+            hallucinations.append((
+                r["dataset"], r["sample_id"], ref, hyp,
+                r.get("boundary_fix_action", "") or "-",
+                f"{wer_val:.3f}",
+            ))
+            needed.add((r["dataset"], r["sample_id"]))
 
     print(f"[load] indexing {len(needed)} samples for audio links ...")
     samples_by_key = _load_sample_index(needed)
@@ -244,12 +192,6 @@ def main(csv_path: Path, out_path: Path) -> None:
 
     lines: list[str] = []
     lines.append(f"# Error analysis — {csv_path.name}\n")
-    lines.append("Filters out samples that look like *data* problems rather than recognition errors:")
-    lines.append("1. **Empty hypothesis** — at least one service returned no text.")
-    lines.append("2. **Reference much shorter than audio** — `words_per_s < 0.3` (with `duration ≥ 1 s`). At normal speech rates this means the label is missing content.")
-    lines.append("3. **All services agree, ref disagrees** — mean pairwise WER between hypotheses < 0.15 AND mean WER vs ref > 0.5. Multiple ASR systems converging on the same answer that differs from the reference is a strong signal of a mislabeled ground truth, not a shared error.")
-    lines.append("4. **Compound-word / segmentation artifact** — all services produce text identical to the reference after removing spaces (e.g. `stummschalten` vs `stumm schalten`). These are correct recognitions scored as errors due to tokenization.")
-    lines.append("")
     lines.append("Audio links (▶) point to `results/audio/<dataset>/<sample_id>.wav` so a reviewer can play the clip directly.")
     lines.append("")
 
@@ -263,17 +205,8 @@ def main(csv_path: Path, out_path: Path) -> None:
         lines.append(f"- **{ds}** — Mazda {loc_name} {scn} voice commands (male + female pooled)")
     lines.append("")
 
-    total_samples = sum(1 for k, v in by_sample.items() if len([s for s in SERVICES if s in v]) >= 2)
-    kept_samples = len(keep)
-    dropped = total_samples - kept_samples
-    lines.append(f"Total complete samples: **{total_samples}**  ")
-    lines.append(f"Kept after filtering: **{kept_samples}**  ")
-    lines.append(f"Excluded as data issues: **{dropped}**  ")
-    lines.append("")
-    lines.append(f"- Empty hypothesis: {len(excluded_empty)}")
-    lines.append(f"- Reference too short for audio: {len(excluded_short_ref)}")
-    lines.append(f"- All services agree, ref disagrees: {len(excluded_mislabel)}")
-    lines.append(f"- Compound-word / segmentation artifact: {len(excluded_compound)}")
+    total_samples = len(by_sample)
+    lines.append(f"Total samples: **{total_samples}**  ")
     lines.append("")
 
     # Speech boundaries
@@ -293,17 +226,16 @@ def main(csv_path: Path, out_path: Path) -> None:
         lines.append("All realtime samples passed the boundary-fix heuristic without trimming.")
         lines.append("")
 
-    # Filtered results
-    lines.append("## Filtered results (excludes data issues)")
+    # Results table
+    lines.append("## Results")
     lines.append("")
     lines.append("INS/DEL/SUB are *rates per 100 reference words*. Their sum ≈ WER × 100.")
     lines.append("")
     lines.append("| Dataset | Service | N | WER | SER | INS/100 | DEL/100 | SUB/100 | LBL ms (mean / p90) | UPL ms (mean / p90) |")
     lines.append("|---|---|---:|---:|---:|---:|---:|---:|---|---|")
-    datasets = sorted({k[0] for k in by_key_filtered.keys()})
-    for ds in datasets:
+    for ds in datasets_seen:
         for svc in SERVICES:
-            rs = by_key_filtered.get((ds, svc), [])
+            rs = by_key.get((ds, svc), [])
             m = metrics_for(rs)
             wer_s = f"{m['wer']:.3f}" if m["wer"] is not None else "-"
             ser_s = f"{m['ser']:.3f}" if m["ser"] is not None else "-"
@@ -313,100 +245,11 @@ def main(csv_path: Path, out_path: Path) -> None:
             lines.append(f"| {ds} | {svc} | {m['n']} | {wer_s} | {ser_s} | {m['ins']} | {m['del']} | {m['sub']} | {lbl_s} | {upl_s} |")
     lines.append("")
 
-    # Unfiltered results
-    lines.append("## Unfiltered results (all complete samples, for reference)")
-    lines.append("")
-    lines.append("| Dataset | Service | N | WER | SER | INS/100 | DEL/100 | SUB/100 |")
-    lines.append("|---|---|---:|---:|---:|---:|---:|---:|")
-    for ds in datasets_seen:
-        for svc in SERVICES:
-            rs = by_key_all.get((ds, svc), [])
-            m = metrics_for(rs)
-            wer_s = f"{m['wer']:.3f}" if m["wer"] is not None else "-"
-            ser_s = f"{m['ser']:.3f}" if m["ser"] is not None else "-"
-            lines.append(f"| {ds} | {svc} | {m['n']} | {wer_s} | {ser_s} | {m['ins']} | {m['del']} | {m['sub']} |")
-    lines.append("")
+    # Best / median / worst WER per (dataset, service)
+    lines.append("## Best / median / worst WER per (dataset, service)\n")
 
-    # Excluded samples
-    lines.append("## Excluded samples — examples\n")
-
-    lines.append("### Empty hypothesis")
-    lines.append("")
-    if not excluded_empty:
-        lines.append("_(none)_\n")
-    else:
-        lines.append("| Audio | Dataset | Sample | Empty in | Reference |")
-        lines.append("|---|---|---|---|---|")
-        for ds, sid, which in excluded_empty[:20]:
-            ref = by_sample[(ds, sid)].get(SERVICES[0], {}).get("reference", "") if SERVICES else ""
-            link = _audio_link(out_dir, ds, sid, audio_cache, samples_by_key).strip() or "-"
-            lines.append(f"| {link} | {ds} | {sid} | {which} | `{ref}` |")
-        if len(excluded_empty) > 20:
-            lines.append(f"\n_(+{len(excluded_empty) - 20} more)_")
-        lines.append("")
-
-    lines.append("### Reference too short for audio duration")
-    lines.append("")
-    if not excluded_short_ref:
-        lines.append("_(none)_\n")
-    else:
-        lines.append("| Audio | Dataset | Sample | words/s | Reference | Sample hypothesis (fast_default) |")
-        lines.append("|---|---|---|---:|---|---|")
-        for ds, sid, wps, ref in sorted(excluded_short_ref, key=lambda x: x[2])[:15]:
-            hyp = by_sample[(ds, sid)].get("fast_default", {}).get("hypothesis", "")
-            link = _audio_link(out_dir, ds, sid, audio_cache, samples_by_key).strip() or "-"
-            lines.append(f"| {link} | {ds} | {sid} | {wps:.2f} | `{ref}` | `{hyp}` |")
-        if len(excluded_short_ref) > 15:
-            lines.append(f"\n_(+{len(excluded_short_ref) - 15} more)_")
-        lines.append("")
-
-    lines.append("### All services agree, reference disagrees (likely mislabeled)")
-    lines.append("")
-    if not excluded_mislabel:
-        lines.append("_(none)_\n")
-    else:
-        for ds, sid, agree, ref, hyps in sorted(excluded_mislabel, key=lambda x: x[2])[:15]:
-            link = _audio_link(out_dir, ds, sid, audio_cache, samples_by_key)
-            lines.append(f"#### {ds}/{sid}{link} — pairwise WER between services = {agree:.3f}")
-            lines.append(f"- ref:           `{ref}`")
-            for s in SERVICES:
-                if s in hyps:
-                    lines.append(f"- {s:<14} `{hyps[s]}`")
-            lines.append("")
-        if len(excluded_mislabel) > 15:
-            lines.append(f"_(+{len(excluded_mislabel) - 15} more)_\n")
-
-    lines.append("### Compound-word / segmentation artifacts")
-    lines.append("")
-    if not excluded_compound:
-        lines.append("_(none)_\n")
-    else:
-        for ds, sid, ref, hyps in sorted(excluded_compound)[:15]:
-            link = _audio_link(out_dir, ds, sid, audio_cache, samples_by_key)
-            lines.append(f"#### {ds}/{sid}{link}")
-            lines.append(f"- ref:           `{ref}`")
-            for s in SERVICES:
-                if s in hyps:
-                    lines.append(f"- {s:<14} `{hyps[s]}`")
-            lines.append("")
-        if len(excluded_compound) > 15:
-            lines.append(f"_(+{len(excluded_compound) - 15} more)_\n")
-
-    # Genuine recognition errors
-    lines.append("## Genuine recognition errors (filtered set)\n")
-    lines.append("Best / median / worst WER per (dataset, service) on the kept samples.\n")
-
-    by_pair_filtered: dict[tuple[str, str], list[dict]] = defaultdict(list)
-    for r in rows:
-        ksamp = (r["dataset"], r["sample_id"])
-        if ksamp not in keep:
-            continue
-        if r["error"] or r["wer"] == "":
-            continue
-        by_pair_filtered[(r["dataset"], r["service"])].append(r)
-
-    for (ds, svc) in sorted(by_pair_filtered.keys()):
-        rs = sorted(by_pair_filtered[(ds, svc)], key=lambda r: float(r["wer"]))
+    for (ds, svc) in sorted(by_pair.keys()):
+        rs = sorted(by_pair[(ds, svc)], key=lambda r: float(r["wer"]))
         n = len(rs)
         if n == 0:
             continue
@@ -423,8 +266,26 @@ def main(csv_path: Path, out_path: Path) -> None:
             lines.append(f"- hyp: `{r.get('hypothesis','')}`")
         lines.append("")
 
+    # fast_llm hallucinations
+    lines.append("## fast_llm hallucinations\n")
+    lines.append("`fast_llm` does not set a locale — it relies on auto-detection. "
+                 "When the acoustic signal is weak or ambiguous, it may produce text "
+                 "in the wrong language or fabricate content from its training data.\n")
+
+    if not hallucinations:
+        lines.append("_(none detected)_\n")
+    else:
+        lines.append(f"Found **{len(hallucinations)}** likely hallucinations "
+                     f"(WER ≥ 0.8 and ≤ 1 word overlap with reference):\n")
+        lines.append("| Audio | Dataset | Sample | WER | Boundary | Reference | Hypothesis |")
+        lines.append("|---|---|---|---:|---|---|---|")
+        for ds, sid, ref, hyp, fix, wer_s in sorted(hallucinations):
+            link = _audio_link(out_dir, ds, sid, audio_cache, samples_by_key).strip() or "-"
+            lines.append(f"| {link} | {ds} | {sid} | {wer_s} | {fix} | `{ref}` | `{hyp}` |")
+        lines.append("")
+
     # Top disagreements
-    lines.append("## Top fast_default vs realtime disagreements (filtered)\n")
+    lines.append("## Top fast_default vs realtime disagreements\n")
     if not top_diffs:
         lines.append("_(none)_\n")
     else:
@@ -445,13 +306,11 @@ def main(csv_path: Path, out_path: Path) -> None:
     lines.append("## Caveats\n")
     lines.append("- **UPL is anchored on the realtime SDK's word-end timestamp** for each sample, so all services use the same `speech_end`. The CSV's `upl_self_ms` column has each service's own phrase-derived value if you want to see how its boundary detection differs.")
     lines.append("- **Mazda voice commands** are short utterances (typically 2-8 words). WER on short references is noisier — a single word error on a 3-word command gives 33% WER.")
-    lines.append("- The 'all-agree-vs-ref' filter is conservative (pairwise WER < 0.15 AND mean ref WER > 0.5). True mislabels with partial agreement still survive and inflate per-service WER equally.")
 
     out_path.write_text("\n".join(lines), encoding="utf-8")
     audio_count = sum(1 for v in audio_cache.values() if v is not None)
     print(f"Wrote {out_path}")
-    print(f"Total: {total_samples}, kept: {kept_samples}, dropped: {dropped}")
-    print(f"  empty: {len(excluded_empty)}  short_ref: {len(excluded_short_ref)}  mislabel: {len(excluded_mislabel)}  compound: {len(excluded_compound)}")
+    print(f"Total samples: {total_samples}")
     print(f"  audio files emitted/linked: {audio_count}")
 
 

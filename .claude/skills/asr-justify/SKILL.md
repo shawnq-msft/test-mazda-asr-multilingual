@@ -29,7 +29,7 @@ Per run, four artifacts live under `results/`:
 |---|---|
 | `<run>.csv` | Per-sample, per-service results. Columns include `wer`, `sentence_error`, `ins`, `del`, `sub`, `ref_len`, `first_latency_ms`, `lbl_ms`, `upl_ms`, `upl_self_ms`, `upl_anchor`, `speech_start_s`, `speech_end_s`, `boundary_fix_action`, `first_word_start_s`, `last_word_end_s`, `error`, `locale`. |
 | `<run>_report.md` | Auto-generated headline aggregate table, dataset / endpoint sections, latency definitions, and a Speech-boundary section listing trimmed samples. |
-| `<run>_error_analysis.md` | Companion produced by [scripts/error_analysis.py](../../scripts/error_analysis.py): excludes data-issue rows (empty hyp, short ref, all-agree-vs-ref, compound artifacts), lists best/median/worst per (dataset, service), top fast_default-vs-realtime disagreements, with `[▶]` audio links. |
+| `<run>_error_analysis.md` | Companion produced by [scripts/error_analysis.py](../../scripts/error_analysis.py): results table, best/median/worst per (dataset, service), fast_llm hallucination list, top cross-service disagreements, with `[▶]` audio links. All samples included (no filtering). |
 | `<run>_words.jsonl` | One JSON object per realtime sample: full word-level timestamps + the boundary-fix decision. Read this when investigating any sample whose `boundary_fix_action != "none"`. |
 | `<run>.csv.strict` | (Created by `scripts/loose_match.py`.) Backup of the CSV before loose-match normalization was applied. Compare against the main CSV to see which rows were corrected. |
 
@@ -40,9 +40,10 @@ by replacing `.csv` with `_report.md` / `_error_analysis.md`.
 ## Procedure
 
 1. **Read the auto report's aggregate table** for the headline numbers.
-2. **Read the error analysis** for the data-issue exclusions and the
-   per-(dataset, service) best/median/worst rows. Most narrative content
-   should come from this file — the auto report is just sums.
+2. **Read the error analysis** for the per-(dataset, service) best/median/worst
+   rows, the fast_llm hallucination list, and the top cross-service
+   disagreements. Most narrative content should come from this file — the
+   auto report is just sums. All samples are included (no filtering).
 3. **Latency QA pass.** For every row check the three latency values
    (`first_latency_ms`, `lbl_ms`, `upl_ms`) against `boundary_fix_action`
    and reasonability:
@@ -83,27 +84,32 @@ by replacing `.csv` with `_report.md` / `_error_analysis.md`.
    normalization"`. If the gap is large for a service, call that out.
 7. **Write the justification** to `results/<run>_justification.md`. Skeleton:
 
-   - **Headline numbers (recap)** — copy the filtered aggregate table
-     from the error analysis (not the unfiltered one from `_report.md`).
+   - **Headline numbers (recap)** — copy the aggregate table
+     from the error analysis (same as `_report.md` — both use
+     all samples with loose-match normalization applied).
    - **One-line take** — which service wins on accuracy, which on
      latency, and the single biggest caveat.
    - **Where the WER numbers are misleading** — explicitly call out:
      - Empty-hypothesis rows. Quote ref + each service's hypothesis.
-     - Dataset-mislabel rows (per-sample WER explodes because ref is
-       too short for the audio). Quote ref + audio duration.
-     - "All services agree, ref disagrees" rows — these survive the
-       filter only when at least one service breaks ranks.
-     - Compound-word / segmentation artifacts that were caught by the
-       filter or loose matching. Quote a few examples.
+     - Short-ref samples where a single word error causes high WER
+       (e.g., 33% on a 3-word command).
      - Stylistic deltas (punctuation, casing) that inflate WER without
        representing recognition error. Quote 3-4 median rows side-by-side.
+     - Compound-word / segmentation artifacts caught by loose matching.
+       Quote a few examples and cite both strict and loose WER when the
+       gap is meaningful.
      - Anchor-trim rows: when boundary_fix trimmed an edge word, briefly
        say what realtime hallucinated and how that would have skewed UPL
        if uncorrected.
-   - **Where the services genuinely disagree** — after excluding the
-     above, summarize the residue. Watch for `fast_llm` language
-     confusion (it has no locale set and may recognize German/French
-     audio as English).
+   - **fast_llm hallucinations** — the error analysis lists samples where
+     `fast_llm` WER ≥ 0.8 with ≤ 1 word overlap with the reference.
+     Summarize the count per language, note that most correlate with
+     `boundary_fix_action=skip` (poor audio), and highlight the language
+     confusion pattern (German recognized as English).
+   - **Where the services genuinely disagree** — summarize the residue
+     after setting aside the above artifacts. Watch for `fast_llm`
+     language confusion (it has no locale set and may recognize
+     German/French audio as English).
    - **INS / DEL / SUB shape** — the breakdown columns reveal *what kind*
      of error each engine makes:
      - High INS rate → engine adds words not in ref (often filler /

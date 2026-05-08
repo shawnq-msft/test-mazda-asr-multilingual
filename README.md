@@ -33,25 +33,25 @@ Total: 5 languages × 3 datasets × 30 samples × 5 services = **2,250 transcrip
 
 ## Summary of Results
 
-WER numbers below are **loose-match filtered**: compound-word splits (`stummschalten` ↔ `stumm schalten`), alphanumeric spacing (`2D` ↔ `2 D`), degree/percent symbol variants, and reference typos (`d'emergenzaa`) are normalized before scoring. Strict (unfiltered) numbers are in each language's report.
+WER numbers below use **loose-match normalization**: compound-word splits (`stummschalten` ↔ `stumm schalten`), alphanumeric spacing (`2D` ↔ `2 D`), degree/percent symbol variants, and reference typos (`d'emergenzaa`) are normalized before scoring. No samples are excluded — all 90 samples per language are included. Strict (pre-normalization) CSVs are saved as `*.csv.strict`.
 
-| Language | Best Service | Filtered WER Range | Samples Kept | Data Quality |
-|---|---|---|---:|---|
-| **es-ES** | fast_mai | 0.071 – 0.142 | 81 / 90 | Moderate (9 empty hyp) |
-| **it-IT** | realtime_refine | 0.086 – 0.104 | 85 / 90 | Good (3 compound artifacts) |
-| **fr-FR** | realtime_refine | 0.091 – 0.141 | 89 / 90 | Good |
-| **en-GB** | fast_llm | 0.165 – 0.232 | 87 / 90 | Excellent |
-| **de-DE** | fast_mai | 0.248 – 0.363 | 60 / 90 | Poor (27 empty hyp, 2 compound) |
+| Language | Best Service | WER Range | Samples |
+|---|---|---|---:|
+| **it-IT** | realtime_refine | 0.096 – 0.119 | 90 |
+| **fr-FR** | realtime_refine | 0.094 – 0.148 | 90 |
+| **es-ES** | fast_mai | 0.139 – 0.217 | 90 |
+| **en-GB** | fast_mai | 0.188 – 0.255 | 90 |
+| **de-DE** | fast_mai | 0.443 – 0.537 | 90 |
 
 ### Key Findings
 
-1. **Spanish is the best-performing language** — WER 0.071–0.142 across services, with fast_mai leading.
+1. **Italian and French are the best-performing languages** — both under 0.15 WER across all services.
 
-2. **Italian and French perform similarly** — both around 0.09 WER at best. The `d'emergenzaa` reference typo (double-a) previously inflated Italian WER; loose matching corrects this.
+2. **English (GB) shows the largest DT vs JT gap** — JT1 WER is 0.05–0.11 (near-perfect) while DT sits at 0.20–0.34. Static commands are well-handled; dynamic ones challenge all services.
 
-3. **English (GB) shows the largest DT vs JT gap** — JT1 WER is 0.05–0.11 (near-perfect) while DT sits at 0.20–0.34. Static commands are well-handled; dynamic ones challenge all services.
+3. **German is the worst-performing language** — WER 0.44–0.54 with many empty-hypothesis cases and frequent language confusion (fast_llm misrecognizes German as English). Compound words ("Außenluftzirkulation", "Rücksitzbelüftung") cause genuine errors beyond what normalization can fix.
 
-4. **German is the worst-performing language** — WER 0.25–0.36 even after excluding 30 problematic samples and applying loose matching. Services frequently misrecognize German as English. Compound words ("Außenluftzirkulation", "Rücksitzbelüftung") still cause genuine errors beyond what normalization can fix.
+4. **fast_llm hallucinates across all languages** — because it does not set a locale, it auto-detects language and often produces English text for non-English audio, or fabricates content entirely. German is worst affected (27 hallucinations). See each language's error analysis for details.
 
 5. **fast_mai is the most consistent winner on accuracy** across languages, while **realtime delivers the lowest latency** (UPL 560–780 ms vs 880–1300 ms for batch services).
 

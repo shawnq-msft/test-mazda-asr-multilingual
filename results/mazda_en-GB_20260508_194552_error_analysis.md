@@ -1,11 +1,5 @@
 # Error analysis — mazda_en-GB_20260508_194552.csv
 
-Filters out samples that look like *data* problems rather than recognition errors:
-1. **Empty hypothesis** — at least one service returned no text.
-2. **Reference much shorter than audio** — `words_per_s < 0.3` (with `duration ≥ 1 s`). At normal speech rates this means the label is missing content.
-3. **All services agree, ref disagrees** — mean pairwise WER between hypotheses < 0.15 AND mean WER vs ref > 0.5. Multiple ASR systems converging on the same answer that differs from the reference is a strong signal of a mislabeled ground truth, not a shared error.
-4. **Compound-word / segmentation artifact** — all services produce text identical to the reference after removing spaces (e.g. `stummschalten` vs `stumm schalten`). These are correct recognitions scored as errors due to tokenization.
-
 Audio links (▶) point to `results/audio/<dataset>/<sample_id>.wav` so a reviewer can play the clip directly.
 
 ## Datasets under test
@@ -14,14 +8,7 @@ Audio links (▶) point to `results/audio/<dataset>/<sample_id>.wav` so a review
 - **en-GB_DT2** — Mazda en-GB DT2 voice commands (male + female pooled)
 - **en-GB_JT1** — Mazda en-GB JT1 voice commands (male + female pooled)
 
-Total complete samples: **90**  
-Kept after filtering: **87**  
-Excluded as data issues: **3**  
-
-- Empty hypothesis: 2
-- Reference too short for audio: 0
-- All services agree, ref disagrees: 1
-- Compound-word / segmentation artifact: 0
+Total samples: **90**  
 
 ## Speech boundaries
 
@@ -29,7 +16,7 @@ Excluded as data issues: **3**
 
 Boundary-fix actions across 90 realtime samples: `skip`=2, `trim_both`=4, `trim_first`=5, `trim_last`=4
 
-## Filtered results (excludes data issues)
+## Results
 
 INS/DEL/SUB are *rates per 100 reference words*. Their sum ≈ WER × 100.
 
@@ -40,67 +27,18 @@ INS/DEL/SUB are *rates per 100 reference words*. Their sum ≈ WER × 100.
 | en-GB_DT1 | fast_mai | 30 | 0.200 | 0.367 | 4.4 | 2.5 | 10.6 | 522 / 630 | 964 / 1171 |
 | en-GB_DT1 | realtime | 30 | 0.241 | 0.500 | 2.5 | 3.8 | 13.8 | -303 / 328 | 619 / 831 |
 | en-GB_DT1 | realtime_refine | 30 | 0.246 | 0.467 | 4.4 | 3.1 | 13.8 | 65 / 736 | 1126 / 1292 |
-| en-GB_DT2 | fast_default | 28 | 0.315 | 0.536 | 3.4 | 6.8 | 19.9 | 593 / 652 | 1046 / 1181 |
-| en-GB_DT2 | fast_llm | 28 | 0.226 | 0.464 | 1.4 | 6.2 | 12.3 | 475 / 530 | 928 / 1059 |
-| en-GB_DT2 | fast_mai | 28 | 0.222 | 0.357 | 4.8 | 0.0 | 14.4 | 482 / 588 | 935 / 1120 |
-| en-GB_DT2 | realtime | 28 | 0.304 | 0.571 | 5.5 | 3.4 | 18.5 | -300 / 327 | 617 / 951 |
-| en-GB_DT2 | realtime_refine | 28 | 0.342 | 0.571 | 5.5 | 2.7 | 23.3 | 129 / 657 | 1189 / 1633 |
-| en-GB_JT1 | fast_default | 29 | 0.055 | 0.172 | 1.3 | 3.2 | 1.9 | 604 / 768 | 1017 / 1305 |
-| en-GB_JT1 | fast_llm | 29 | 0.048 | 0.172 | 0.6 | 3.8 | 1.3 | 474 / 516 | 886 / 1058 |
-| en-GB_JT1 | fast_mai | 29 | 0.073 | 0.207 | 1.3 | 3.8 | 3.2 | 491 / 610 | 904 / 1062 |
-| en-GB_JT1 | realtime | 29 | 0.105 | 0.276 | 1.3 | 3.2 | 5.1 | -268 / 328 | 618 / 911 |
-| en-GB_JT1 | realtime_refine | 29 | 0.108 | 0.241 | 3.2 | 2.5 | 3.8 | 77 / 704 | 1110 / 1320 |
+| en-GB_DT2 | fast_default | 30 | 0.356 | 0.567 | 3.1 | 12.5 | 20.0 | 594 / 652 | 1090 / 1221 |
+| en-GB_DT2 | fast_llm | 30 | 0.273 | 0.500 | 1.9 | 8.1 | 16.9 | 476 / 530 | 974 / 1130 |
+| en-GB_DT2 | fast_mai | 30 | 0.261 | 0.400 | 4.4 | 2.5 | 17.5 | 482 / 588 | 908 / 1120 |
+| en-GB_DT2 | realtime | 30 | 0.351 | 0.600 | 5.0 | 11.9 | 16.9 | -300 / 327 | 617 / 951 |
+| en-GB_DT2 | realtime_refine | 30 | 0.382 | 0.600 | 5.0 | 6.2 | 25.6 | 125 / 657 | 1243 / 1691 |
+| en-GB_JT1 | fast_default | 30 | 0.086 | 0.200 | 2.5 | 3.1 | 1.9 | 603 / 768 | 1011 / 1305 |
+| en-GB_JT1 | fast_llm | 30 | 0.080 | 0.200 | 1.9 | 3.8 | 1.2 | 474 / 516 | 882 / 1058 |
+| en-GB_JT1 | fast_mai | 30 | 0.104 | 0.233 | 2.5 | 3.8 | 3.1 | 496 / 626 | 904 / 1062 |
+| en-GB_JT1 | realtime | 30 | 0.135 | 0.300 | 2.5 | 3.1 | 5.0 | -248 / 328 | 614 / 911 |
+| en-GB_JT1 | realtime_refine | 30 | 0.138 | 0.267 | 4.4 | 2.5 | 3.8 | 102 / 721 | 1112 / 1320 |
 
-## Unfiltered results (all complete samples, for reference)
-
-| Dataset | Service | N | WER | SER | INS/100 | DEL/100 | SUB/100 |
-|---|---|---:|---:|---:|---:|---:|---:|
-| en-GB_DT1 | fast_default | 30 | 0.260 | 0.433 | 3.8 | 5.6 | 12.5 |
-| en-GB_DT1 | fast_llm | 30 | 0.220 | 0.367 | 4.4 | 5.0 | 8.8 |
-| en-GB_DT1 | fast_mai | 30 | 0.200 | 0.367 | 4.4 | 2.5 | 10.6 |
-| en-GB_DT1 | realtime | 30 | 0.241 | 0.500 | 2.5 | 3.8 | 13.8 |
-| en-GB_DT1 | realtime_refine | 30 | 0.246 | 0.467 | 4.4 | 3.1 | 13.8 |
-| en-GB_DT2 | fast_default | 30 | 0.356 | 0.567 | 3.1 | 12.5 | 20.0 |
-| en-GB_DT2 | fast_llm | 30 | 0.273 | 0.500 | 1.9 | 8.1 | 16.9 |
-| en-GB_DT2 | fast_mai | 30 | 0.261 | 0.400 | 4.4 | 2.5 | 17.5 |
-| en-GB_DT2 | realtime | 30 | 0.351 | 0.600 | 5.0 | 11.9 | 16.9 |
-| en-GB_DT2 | realtime_refine | 30 | 0.382 | 0.600 | 5.0 | 6.2 | 25.6 |
-| en-GB_JT1 | fast_default | 30 | 0.086 | 0.200 | 2.5 | 3.1 | 1.9 |
-| en-GB_JT1 | fast_llm | 30 | 0.080 | 0.200 | 1.9 | 3.8 | 1.2 |
-| en-GB_JT1 | fast_mai | 30 | 0.104 | 0.233 | 2.5 | 3.8 | 3.1 |
-| en-GB_JT1 | realtime | 30 | 0.135 | 0.300 | 2.5 | 3.1 | 5.0 |
-| en-GB_JT1 | realtime_refine | 30 | 0.138 | 0.267 | 4.4 | 2.5 | 3.8 |
-
-## Excluded samples — examples
-
-### Empty hypothesis
-
-| Audio | Dataset | Sample | Empty in | Reference |
-|---|---|---|---|---|
-| [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Set%20the%20%20POI%20%20as%20my%20home.wav.wav) | en-GB_DT2 | 1l_en-GB_female-DT2/Set the  POI  as my home.wav | fast_default,realtime | `Set the  POI  as my home` |
-| [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Turn%20off%20wireless%20charging%20Turn%20off%20wireless%20charging.wav.wav) | en-GB_DT2 | 1l_en-GB_male-DT2/Turn off wireless charging Turn off wireless charging.wav | realtime | `Turn off wireless charging Turn off wireless charging` |
-
-### Reference too short for audio duration
-
-_(none)_
-
-### All services agree, reference disagrees (likely mislabeled)
-
-#### en-GB_JT1/1l_en-GB_female-JT1/Play 100.wav [▶](audio/en-GB_JT1/1l_en-GB_female-JT1/Play%20100.wav.wav) — pairwise WER between services = 0.000
-- ref:           `Play 100`
-- fast_default   `Play 100.7 FM.`
-- fast_llm       `Play 100.7 FM.`
-- fast_mai       `Play 100.7 FM.`
-- realtime       `Play 100.7 FM.`
-- realtime_refine `Play 100.7 FM.`
-
-### Compound-word / segmentation artifacts
-
-_(none)_
-
-## Genuine recognition errors (filtered set)
-
-Best / median / worst WER per (dataset, service) on the kept samples.
+## Best / median / worst WER per (dataset, service)
 
 ### en-GB_DT1 / fast_default  (n=30)
 **BEST** — `1l_en-GB_male-DT1/Play the previous song.wav` [▶](audio/en-GB_DT1/1l_en-GB_male-DT1/Play%20the%20previous%20song.wav.wav)  wer=0.000  speech=[1.07s, 2.55s]  fix=none
@@ -157,117 +95,134 @@ Best / median / worst WER per (dataset, service) on the kept samples.
 - ref: `Play 100`
 - hyp: `100.7 FM.`
 
-### en-GB_DT2 / fast_default  (n=28)
+### en-GB_DT2 / fast_default  (n=30)
 **BEST** — `1l_en-GB_male-DT2/Play the previous song.wav` [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Play%20the%20previous%20song.wav.wav)  wer=0.000  speech=[1.04s, 2.64s]  fix=none
 - ref: `Play the previous song`
 - hyp: `Play the previous song.`
-**MEDIAN** — `1l_en-GB_female-DT2/Disable automatic door unlocking when parked.wav` [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Disable%20automatic%20door%20unlocking%20when%20parked.wav.wav)  wer=0.167  speech=[1.52s, 5.28s]  fix=none
-- ref: `Disable automatic door unlocking when parked`
-- hyp: `Disable automatic door unlinking when parked.`
+**MEDIAN** — `1l_en-GB_female-DT2/Increase the HUD brightness slightly.wav` [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Increase%20the%20HUD%20brightness%20slightly.wav.wav)  wer=0.200  speech=[2.24s, 3.96s]  fix=none
+- ref: `Increase the HUD brightness slightly`
+- hyp: `Reduce the HUD brightness slightly.`
 **WORST** — `1l_en-GB_female-DT2/Close HUD.wav` [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Close%20HUD.wav.wav)  wer=1.000  speech=[1.99s, 2.63s]  fix=trim_first
 - ref: `Close HUD`
 - hyp: `Hello, HED.`
 
-### en-GB_DT2 / fast_llm  (n=28)
+### en-GB_DT2 / fast_llm  (n=30)
 **BEST** — `1l_en-GB_male-DT2/Play the previous song.wav` [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Play%20the%20previous%20song.wav.wav)  wer=0.000  speech=[1.04s, 2.64s]  fix=none
 - ref: `Play the previous song`
 - hyp: `Play the previous song.`
-**MEDIAN** — `1l_en-GB_female-DT2/Page 4.wav` [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Page%204.wav.wav)  wer=0.000  speech=[1.19s, 2.43s]  fix=none
-- ref: `Page 4`
-- hyp: `Page 4.`
+**MEDIAN** — `1l_en-GB_female-DT2/Change the fan's direction to face.wav` [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Change%20the%20fan%27s%20direction%20to%20face.wav.wav)  wer=0.143  speech=[1.71s, 4.59s]  fix=none
+- ref: `Change the fan's direction to face`
+- hyp: `Change the plane's direction to face.`
 **WORST** — `1l_en-GB_male-DT2/Adjust ringtone volume to 5 levels.wav` [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Adjust%20ringtone%20volume%20to%205%20levels.wav.wav)  wer=1.167  speech=[1.13s, 2.97s]  fix=trim_last
 - ref: `Adjust ringtone volume to 5 levels`
 - hyp: `Just bring home volumes of fiber optics.`
 
-### en-GB_DT2 / fast_mai  (n=28)
+### en-GB_DT2 / fast_mai  (n=30)
 **BEST** — `1l_en-GB_male-DT2/Play the previous song.wav` [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Play%20the%20previous%20song.wav.wav)  wer=0.000  speech=[1.04s, 2.64s]  fix=none
 - ref: `Play the previous song`
 - hyp: `Play the previous song.`
-**MEDIAN** — `1l_en-GB_female-DT2/Open right rear window to 60%.wav` [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Open%20right%20rear%20window%20to%2060%25.wav.wav)  wer=0.000  speech=[1.23s, 3.47s]  fix=trim_last
-- ref: `Open right rear window to 60%`
-- hyp: `Open right rear window to 60%.`
+**MEDIAN** — `1l_en-GB_male-DT2/Please slide the seat forward.wav` [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Please%20slide%20the%20seat%20forward.wav.wav)  wer=0.000  speech=[1.08s, 3.0s]  fix=none
+- ref: `Please slide the seat forward`
+- hyp: `Please slide the seat forward.`
 **WORST** — `1l_en-GB_female-DT2/Close HUD.wav` [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Close%20HUD.wav.wav)  wer=1.500  speech=[1.99s, 2.63s]  fix=trim_first
 - ref: `Close HUD`
 - hyp: `Close. H-E-D.`
 
-### en-GB_DT2 / realtime  (n=28)
+### en-GB_DT2 / realtime  (n=30)
 **BEST** — `1l_en-GB_male-DT2/Play the previous song.wav` [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Play%20the%20previous%20song.wav.wav)  wer=0.000  speech=[1.04s, 2.64s]  fix=none
 - ref: `Play the previous song`
 - hyp: `Play the previous song.`
-**MEDIAN** — `1l_en-GB_female-DT2/Decrease the driver's window.wav` [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Decrease%20the%20driver%27s%20window.wav.wav)  wer=0.200  speech=[2.21s, 3.73s]  fix=none
-- ref: `Decrease the driver's window`
-- hyp: `Tweeze the driver's window.`
+**MEDIAN** — `1l_en-GB_male-DT2/Please slide the seat forward.wav` [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Please%20slide%20the%20seat%20forward.wav.wav)  wer=0.200  speech=[1.08s, 3.0s]  fix=none
+- ref: `Please slide the seat forward`
+- hyp: `We slide the seat forward.`
 **WORST** — `1l_en-GB_male-DT2/Close front row window to half.wav` [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Close%20front%20row%20window%20to%20half.wav.wav)  wer=1.000  speech=[1.45s, 2.41s]  fix=trim_both
 - ref: `Close front row window to half`
 - hyp: `It's the right row window cousins.`
 
-### en-GB_DT2 / realtime_refine  (n=28)
+### en-GB_DT2 / realtime_refine  (n=30)
 **BEST** — `1l_en-GB_male-DT2/Play the previous song.wav` [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Play%20the%20previous%20song.wav.wav)  wer=0.000  speech=[1.04s, 2.64s]  fix=none
 - ref: `Play the previous song`
 - hyp: `Play the previous song.`
-**MEDIAN** — `1l_en-GB_female-DT2/Decrease the driver's window.wav` [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Decrease%20the%20driver%27s%20window.wav.wav)  wer=0.200  speech=[2.21s, 3.73s]  fix=none
-- ref: `Decrease the driver's window`
-- hyp: `Squeeze the driver's window.`
+**MEDIAN** — `1l_en-GB_male-DT2/Set the front row to the lowest temperature.wav` [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Set%20the%20front%20row%20to%20the%20lowest%20temperature.wav.wav)  wer=0.250  speech=[1.06s, 3.72s]  fix=none
+- ref: `Set the front row to the lowest temperature`
+- hyp: `Set your front row to the notice temperature.`
 **WORST** — `1l_en-GB_female-DT2/Show the AC setting page.wav` [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Show%20the%20AC%20setting%20page.wav.wav)  wer=1.200  speech=[1.43s, 3.91s]  fix=none
 - ref: `Show the AC setting page`
 - hyp: `Sharon P.H.C., Duffing Coach.`
 
-### en-GB_JT1 / fast_default  (n=29)
+### en-GB_JT1 / fast_default  (n=30)
 **BEST** — `1l_en-GB_male-JT1/Play the previous song.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Play%20the%20previous%20song.wav.wav)  wer=0.000  speech=[1.06s, 2.74s]  fix=none
 - ref: `Play the previous song`
 - hyp: `Play the previous song.`
-**MEDIAN** — `1l_en-GB_male-JT1/Disable Apple Carplay.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Disable%20Apple%20Carplay.wav.wav)  wer=0.000  speech=[1.06s, 2.78s]  fix=none
-- ref: `Disable Apple Carplay`
-- hyp: `Disable Apple CarPlay.`
-**WORST** — `1l_en-GB_male-JT1/Turn off wireless charging Turn off wireless charging.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Turn%20off%20wireless%20charging%20Turn%20off%20wireless%20charging.wav.wav)  wer=0.500  speech=[1.06s, 2.98s]  fix=none
-- ref: `Turn off wireless charging Turn off wireless charging`
-- hyp: `Turn off wireless charging.`
+**MEDIAN** — `1l_en-GB_male-JT1/Mute the voice.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Mute%20the%20voice.wav.wav)  wer=0.000  speech=[1.05s, 2.29s]  fix=none
+- ref: `Mute the voice`
+- hyp: `Mute the voice.`
+**WORST** — `1l_en-GB_female-JT1/Play 100.wav` [▶](audio/en-GB_JT1/1l_en-GB_female-JT1/Play%20100.wav.wav)  wer=1.000  speech=[1.09s, 3.73s]  fix=trim_last
+- ref: `Play 100`
+- hyp: `Play 100.7 FM.`
 
-### en-GB_JT1 / fast_llm  (n=29)
+### en-GB_JT1 / fast_llm  (n=30)
 **BEST** — `1l_en-GB_male-JT1/Play the previous song.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Play%20the%20previous%20song.wav.wav)  wer=0.000  speech=[1.06s, 2.74s]  fix=none
 - ref: `Play the previous song`
 - hyp: `Play the previous song.`
-**MEDIAN** — `1l_en-GB_male-JT1/Disable Apple Carplay.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Disable%20Apple%20Carplay.wav.wav)  wer=0.000  speech=[1.06s, 2.78s]  fix=none
-- ref: `Disable Apple Carplay`
-- hyp: `Disable Apple CarPlay.`
-**WORST** — `1l_en-GB_male-JT1/Turn off wireless charging Turn off wireless charging.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Turn%20off%20wireless%20charging%20Turn%20off%20wireless%20charging.wav.wav)  wer=0.500  speech=[1.06s, 2.98s]  fix=none
-- ref: `Turn off wireless charging Turn off wireless charging`
-- hyp: `Turn off wireless charging.`
+**MEDIAN** — `1l_en-GB_male-JT1/Mute the voice.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Mute%20the%20voice.wav.wav)  wer=0.000  speech=[1.05s, 2.29s]  fix=none
+- ref: `Mute the voice`
+- hyp: `Mute the voice.`
+**WORST** — `1l_en-GB_female-JT1/Play 100.wav` [▶](audio/en-GB_JT1/1l_en-GB_female-JT1/Play%20100.wav.wav)  wer=1.000  speech=[1.09s, 3.73s]  fix=trim_last
+- ref: `Play 100`
+- hyp: `Play 100.7 FM.`
 
-### en-GB_JT1 / fast_mai  (n=29)
+### en-GB_JT1 / fast_mai  (n=30)
 **BEST** — `1l_en-GB_male-JT1/Play the previous song.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Play%20the%20previous%20song.wav.wav)  wer=0.000  speech=[1.06s, 2.74s]  fix=none
 - ref: `Play the previous song`
 - hyp: `Play the previous song.`
-**MEDIAN** — `1l_en-GB_male-JT1/Disable Apple Carplay.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Disable%20Apple%20Carplay.wav.wav)  wer=0.000  speech=[1.06s, 2.78s]  fix=none
-- ref: `Disable Apple Carplay`
-- hyp: `Disable Apple CarPlay.`
-**WORST** — `1l_en-GB_female-JT1/Decrease the driver's window.wav` [▶](audio/en-GB_JT1/1l_en-GB_female-JT1/Decrease%20the%20driver%27s%20window.wav.wav)  wer=0.800  speech=[2.28s, 3.68s]  fix=none
-- ref: `Decrease the driver's window`
-- hyp: `Please close the Drivers window.`
+**MEDIAN** — `1l_en-GB_male-JT1/Mute the voice.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Mute%20the%20voice.wav.wav)  wer=0.000  speech=[1.05s, 2.29s]  fix=none
+- ref: `Mute the voice`
+- hyp: `Mute the voice.`
+**WORST** — `1l_en-GB_female-JT1/Play 100.wav` [▶](audio/en-GB_JT1/1l_en-GB_female-JT1/Play%20100.wav.wav)  wer=1.000  speech=[1.09s, 3.73s]  fix=trim_last
+- ref: `Play 100`
+- hyp: `Play 100.7 FM.`
 
-### en-GB_JT1 / realtime  (n=29)
+### en-GB_JT1 / realtime  (n=30)
 **BEST** — `1l_en-GB_male-JT1/Play the previous song.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Play%20the%20previous%20song.wav.wav)  wer=0.000  speech=[1.06s, 2.74s]  fix=none
 - ref: `Play the previous song`
 - hyp: `Play the previous song.`
-**MEDIAN** — `1l_en-GB_male-JT1/Turn the ringtone volume up.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Turn%20the%20ringtone%20volume%20up.wav.wav)  wer=0.000  speech=[1.05s, 2.69s]  fix=none
-- ref: `Turn the ringtone volume up`
-- hyp: `Turn the ringtone volume up.`
+**MEDIAN** — `1l_en-GB_female-JT1/Open right rear window to 60%.wav` [▶](audio/en-GB_JT1/1l_en-GB_female-JT1/Open%20right%20rear%20window%20to%2060%25.wav.wav)  wer=0.000  speech=[1.22s, 4.14s]  fix=none
+- ref: `Open right rear window to 60%`
+- hyp: `Open right rear window to 60%.`
 **WORST** — `1l_en-GB_female-JT1/Close HUD.wav` [▶](audio/en-GB_JT1/1l_en-GB_female-JT1/Close%20HUD.wav.wav)  wer=1.000  speech=[2.03s, 2.63s]  fix=trim_first
 - ref: `Close HUD`
 - hyp: `Lowe's HUD.`
 
-### en-GB_JT1 / realtime_refine  (n=29)
+### en-GB_JT1 / realtime_refine  (n=30)
 **BEST** — `1l_en-GB_male-JT1/Play the previous song.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Play%20the%20previous%20song.wav.wav)  wer=0.000  speech=[1.06s, 2.74s]  fix=none
 - ref: `Play the previous song`
 - hyp: `Play the previous song.`
-**MEDIAN** — `1l_en-GB_male-JT1/Turn the ringtone volume up.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Turn%20the%20ringtone%20volume%20up.wav.wav)  wer=0.000  speech=[1.05s, 2.69s]  fix=none
-- ref: `Turn the ringtone volume up`
-- hyp: `Turn the ringtone volume up.`
+**MEDIAN** — `1l_en-GB_male-JT1/Lower fan speed by 1 level.wav` [▶](audio/en-GB_JT1/1l_en-GB_male-JT1/Lower%20fan%20speed%20by%201%20level.wav.wav)  wer=0.000  speech=[1.03s, 3.27s]  fix=none
+- ref: `Lower fan speed by 1 level`
+- hyp: `Lower fan speed by 1 level.`
 **WORST** — `1l_en-GB_female-JT1/Close HUD.wav` [▶](audio/en-GB_JT1/1l_en-GB_female-JT1/Close%20HUD.wav.wav)  wer=1.000  speech=[2.03s, 2.63s]  fix=trim_first
 - ref: `Close HUD`
 - hyp: `Lowe's HUD.`
 
-## Top fast_default vs realtime disagreements (filtered)
+## fast_llm hallucinations
+
+`fast_llm` does not set a locale — it relies on auto-detection. When the acoustic signal is weak or ambiguous, it may produce text in the wrong language or fabricate content from its training data.
+
+Found **8** likely hallucinations (WER ≥ 0.8 and ≤ 1 word overlap with reference):
+
+| Audio | Dataset | Sample | WER | Boundary | Reference | Hypothesis |
+|---|---|---|---:|---|---|---|
+| [▶](audio/en-GB_DT1/1l_en-GB_female-DT1/Close%20HUD.wav.wav) | en-GB_DT1 | 1l_en-GB_female-DT1/Close HUD.wav | 1.000 | trim_first | `Close HUD` | `Phone Heath.` |
+| [▶](audio/en-GB_DT1/1l_en-GB_male-DT1/Disable%20Apple%20Carplay.wav.wav) | en-GB_DT1 | 1l_en-GB_male-DT1/Disable Apple Carplay.wav | 1.000 | none | `Disable Apple Carplay` | `Saibo Aapo Kaapre.` |
+| [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Play%20100.wav.wav) | en-GB_DT2 | 1l_en-GB_female-DT2/Play 100.wav | 1.000 | trim_last | `Play 100` | `Play 127 FM.` |
+| [▶](audio/en-GB_DT2/1l_en-GB_female-DT2/Set%20the%20%20POI%20%20as%20my%20home.wav.wav) | en-GB_DT2 | 1l_en-GB_female-DT2/Set the  POI  as my home.wav | 1.167 | skip | `Set the  POI  as my home` | `Thanks, Paul. You are running a business.` |
+| [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Adjust%20ringtone%20volume%20to%205%20levels.wav.wav) | en-GB_DT2 | 1l_en-GB_male-DT2/Adjust ringtone volume to 5 levels.wav | 1.167 | trim_last | `Adjust ringtone volume to 5 levels` | `Just bring home volumes of fiber optics.` |
+| [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Close%20front%20row%20window%20to%20half.wav.wav) | en-GB_DT2 | 1l_en-GB_male-DT2/Close front row window to half.wav | 0.833 | trim_both | `Close front row window to half` | `Window.` |
+| [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Disable%20Apple%20Carplay.wav.wav) | en-GB_DT2 | 1l_en-GB_male-DT2/Disable Apple Carplay.wav | 1.000 | none | `Disable Apple Carplay` | `细胞压迫康病` |
+| [▶](audio/en-GB_DT2/1l_en-GB_male-DT2/Turn%20off%20wireless%20charging%20Turn%20off%20wireless%20charging.wav.wav) | en-GB_DT2 | 1l_en-GB_male-DT2/Turn off wireless charging Turn off wireless charging.wav | 0.875 | skip | `Turn off wireless charging Turn off wireless charging` | `Turn on Wi-Fi.` |
+
+## Top fast_default vs realtime disagreements
 
 ### en-GB_JT1/1l_en-GB_female-JT1/Close HUD.wav [▶](audio/en-GB_JT1/1l_en-GB_female-JT1/Close%20HUD.wav.wav)  Δwer=1.000  (fast_default=0.000, realtime=1.000)  speech=[2.03s, 2.63s] fix=trim_first
 - ref:           `Close HUD`
@@ -353,4 +308,3 @@ Best / median / worst WER per (dataset, service) on the kept samples.
 
 - **UPL is anchored on the realtime SDK's word-end timestamp** for each sample, so all services use the same `speech_end`. The CSV's `upl_self_ms` column has each service's own phrase-derived value if you want to see how its boundary detection differs.
 - **Mazda voice commands** are short utterances (typically 2-8 words). WER on short references is noisier — a single word error on a 3-word command gives 33% WER.
-- The 'all-agree-vs-ref' filter is conservative (pairwise WER < 0.15 AND mean ref WER > 0.5). True mislabels with partial agreement still survive and inflate per-service WER equally.
