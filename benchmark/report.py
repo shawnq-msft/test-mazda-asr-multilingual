@@ -71,6 +71,14 @@ def _endpoints_for_locale(locale: str) -> dict[str, dict]:
                      "PostProcessingOption is not set."),
             "doc": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/how-to-recognize-speech",
         },
+        "whisper_v3": {
+            "name": "Azure Fast Transcription — Whisper large-v3",
+            "url": f"{_REST_BASE}?api-version={FAST_API_VERSION}",
+            "transport": "HTTPS POST (multipart/form-data, chunked)",
+            "config": f'definition = {{"locales": ["{locale}"], "model": "whisper-large-v3"}}',
+            "partials": "no",
+            "doc": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/fast-transcription-create",
+        },
     }
 
 

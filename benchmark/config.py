@@ -23,8 +23,8 @@ REFINE_AZURE_REGION = os.getenv("REFINE_AZURE_SPEECH_REGION") or AZURE_SPEECH_RE
 FAST_API_VERSION = "2024-11-15"
 LLM_API_VERSION = "2025-10-15"
 
-LOCALES = ("de-DE", "en-GB", "es-ES", "fr-FR", "it-IT")
-SCENARIOS = ("DT1", "DT2", "JT1")
+LOCALES = ("de-DE", "en-GB", "es-ES", "fr-FR", "it-IT", "nb-NO", "nl-NL", "pl-PL", "sv-SE")
+SCENARIOS = ("DT1", "DT2", "DT3", "DT4", "DT5", "JT1", "JT2", "JT3", "JT4")
 
 TARGET_SR = 16000
 TARGET_CHANNELS = 1
@@ -33,7 +33,7 @@ TARGET_SAMPWIDTH = 2
 REALTIME_CHUNK_MS = 100
 SEGMENTATION_SILENCE_MS = 500
 
-SERVICES = ("fast_default", "fast_llm", "fast_mai", "realtime", "realtime_refine")
+SERVICES = ("fast_default", "fast_llm", "fast_mai", "realtime", "realtime_refine", "whisper_v3")
 
 
 def rest_base_url() -> str:

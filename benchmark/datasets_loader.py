@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import random
 from pathlib import Path
 
@@ -7,6 +8,8 @@ from .audio_utils import load_audio_as_pcm16_mono_16k, write_pcm16_wav
 from .config import LOCALES, SCENARIOS, Sample
 
 DATA_ROOT = Path(__file__).resolve().parent.parent / "TestAudio3.0"
+
+_NUMBERED_PREFIX = re.compile(r"^\d+\.")
 
 
 def _scenario_dirs(locale: str, scenario: str) -> list[Path]:
@@ -33,6 +36,23 @@ def _load_trans(trans_path: Path) -> list[tuple[str, str]]:
     return entries
 
 
+def _ref_from_filename(name: str) -> str:
+    """Derive reference text from wav filename: strip .wav, strip optional NNN. prefix."""
+    stem = name.rsplit(".", 1)[0] if name.lower().endswith(".wav") else name
+    stem = _NUMBERED_PREFIX.sub("", stem)
+    return stem
+
+
+def _load_from_wavs(directory: Path) -> list[tuple[str, str]]:
+    """Load samples by deriving reference from wav filenames (no trans.txt)."""
+    entries = []
+    for wav in sorted(directory.glob("*.wav")):
+        ref = _ref_from_filename(wav.name)
+        if ref:
+            entries.append((wav.name, ref))
+    return entries
+
+
 def iter_samples(dataset: str, limit: int | None = 30,
                  seed: int = 42) -> list[Sample]:
     parts = dataset.rsplit("_", 1)
@@ -47,9 +67,11 @@ def iter_samples(dataset: str, limit: int | None = 30,
     all_entries: list[tuple[Path, str, str]] = []
     for d in dirs:
         trans_path = d / "trans.txt"
-        if not trans_path.exists():
-            continue
-        for filename, reference in _load_trans(trans_path):
+        if trans_path.exists():
+            pairs = _load_trans(trans_path)
+        else:
+            pairs = _load_from_wavs(d)
+        for filename, reference in pairs:
             wav_path = d / filename
             if wav_path.exists():
                 all_entries.append((wav_path, reference, f"{d.name}/{filename}"))

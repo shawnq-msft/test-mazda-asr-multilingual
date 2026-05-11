@@ -13,6 +13,7 @@ from . import boundary_fix
 from .asr_fast import transcribe_fast_default
 from .asr_llm_speech import transcribe_fast_llm, transcribe_fast_mai
 from .asr_realtime import transcribe_realtime, transcribe_realtime_refine
+from .asr_whisper import transcribe_whisper_v3
 from .config import SERVICES, AsrResult, Sample
 from .metrics import wer, wer_breakdown, sentence_error
 
@@ -22,6 +23,7 @@ ADAPTERS = {
     "fast_mai": transcribe_fast_mai,
     "realtime": transcribe_realtime,
     "realtime_refine": transcribe_realtime_refine,
+    "whisper_v3": transcribe_whisper_v3,
 }
 
 CSV_FIELDS = [

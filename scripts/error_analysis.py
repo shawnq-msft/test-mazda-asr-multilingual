@@ -1,6 +1,6 @@
 """Error analysis companion to the benchmark report.
 
-Lists best/median/worst per (dataset, service), fast_llm hallucinations,
+Lists worst errors, most common error patterns, fast_llm hallucinations,
 top fast_default vs realtime disagreements, with [▶] audio links.
 """
 from __future__ import annotations
@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from benchmark.datasets_loader import iter_samples, write_pcm16_wav  # noqa: E402
 from benchmark.metrics import aggregate, normalize_text  # noqa: E402
 
-ALL_KNOWN_SERVICES = ("fast_default", "fast_llm", "fast_mai", "realtime", "realtime_refine")
+ALL_KNOWN_SERVICES = ("fast_default", "fast_llm", "fast_mai", "realtime", "realtime_refine", "whisper_v3")
 
 
 def wer_calc(ref: str, hyp: str) -> float:
@@ -111,18 +111,33 @@ def main(csv_path: Path, out_path: Path) -> None:
     # Collect sample IDs needed for audio links
     needed: set[tuple[str, str]] = set()
 
-    # Best/median/worst per (dataset, service)
-    by_pair: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    # Worst errors per service (top N highest WER rows)
+    WORST_N = 10
+    worst_rows: list[dict] = []
     for r in rows:
         if r["error"] or r["wer"] == "":
             continue
-        by_pair[(r["dataset"], r["service"])].append(r)
-    for (ds, _svc), rs in by_pair.items():
-        if not rs:
+        w = float(r["wer"])
+        if w > 0:
+            worst_rows.append(r)
+    worst_rows.sort(key=lambda r: float(r["wer"]), reverse=True)
+    worst_rows = worst_rows[:WORST_N]
+    for r in worst_rows:
+        needed.add((r["dataset"], r["sample_id"]))
+
+    # Most common substitution patterns across all services
+    sub_patterns: Counter = Counter()
+    for r in rows:
+        if r["error"] or r["wer"] == "":
             continue
-        rs_sorted = sorted(rs, key=lambda r: float(r["wer"]))
-        for r in (rs_sorted[0], rs_sorted[len(rs_sorted) // 2], rs_sorted[-1]):
-            needed.add((ds, r["sample_id"]))
+        ref_norm = normalize_text(r.get("reference", "") or "")
+        hyp_norm = normalize_text(r.get("hypothesis", "") or "")
+        ref_words = ref_norm.split()
+        hyp_words = hyp_norm.split()
+        if len(ref_words) == len(hyp_words):
+            for rw, hw in zip(ref_words, hyp_words):
+                if rw != hw:
+                    sub_patterns[(rw, hw)] += 1
 
     # Top fast_default vs realtime disagreements
     all_keys = set(by_sample.keys())
@@ -245,26 +260,29 @@ def main(csv_path: Path, out_path: Path) -> None:
             lines.append(f"| {ds} | {svc} | {m['n']} | {wer_s} | {ser_s} | {m['ins']} | {m['del']} | {m['sub']} | {lbl_s} | {upl_s} |")
     lines.append("")
 
-    # Best / median / worst WER per (dataset, service)
-    lines.append("## Best / median / worst WER per (dataset, service)\n")
+    # Worst errors
+    lines.append("## Worst errors\n")
+    lines.append(f"Top {len(worst_rows)} highest-WER rows across all services:\n")
+    lines.append("| Audio | Dataset | Sample | Service | WER | Reference | Hypothesis |")
+    lines.append("|---|---|---|---|---:|---|---|")
+    for r in worst_rows:
+        link = _audio_link(out_dir, r["dataset"], r["sample_id"],
+                           audio_cache, samples_by_key).strip() or "-"
+        lines.append(f"| {link} | {r['dataset']} | {r['sample_id']} | {r['service']} | {float(r['wer']):.3f} | `{r.get('reference','')}` | `{r.get('hypothesis','')}` |")
+    lines.append("")
 
-    for (ds, svc) in sorted(by_pair.keys()):
-        rs = sorted(by_pair[(ds, svc)], key=lambda r: float(r["wer"]))
-        n = len(rs)
-        if n == 0:
-            continue
-        best = rs[0]; med = rs[n // 2]; worst = rs[-1]
-        lines.append(f"### {ds} / {svc}  (n={n})")
-        for label, r in (("BEST", best), ("MEDIAN", med), ("WORST", worst)):
-            link = _audio_link(out_dir, r["dataset"], r["sample_id"],
-                               audio_cache, samples_by_key)
-            ss = r.get("speech_start_s", "") or "-"
-            se = r.get("speech_end_s", "") or "-"
-            fix = r.get("boundary_fix_action", "") or "-"
-            lines.append(f"**{label}** — `{r['sample_id']}`{link}  wer={float(r['wer']):.3f}  speech=[{ss}s, {se}s]  fix={fix}")
-            lines.append(f"- ref: `{r.get('reference','')}`")
-            lines.append(f"- hyp: `{r.get('hypothesis','')}`")
+    # Most common substitution patterns
+    lines.append("## Most common substitution patterns\n")
+    top_subs = sub_patterns.most_common(15)
+    if top_subs:
+        lines.append("Equal-length ref/hyp word-level substitutions (across all services):\n")
+        lines.append("| Count | Reference word | Hypothesis word |")
+        lines.append("|---:|---|---|")
+        for (rw, hw), cnt in top_subs:
+            lines.append(f"| {cnt} | `{rw}` | `{hw}` |")
         lines.append("")
+    else:
+        lines.append("_(no equal-length substitution patterns found)_\n")
 
     # fast_llm hallucinations
     lines.append("## fast_llm hallucinations\n")
