@@ -39,14 +39,32 @@ def _endpoints_for_locale(locale: str) -> dict[str, dict]:
             "note": "Requires Speech resource with LLM-Speech preview enabled.",
             "doc": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/llm-speech",
         },
-        "fast_mai": {
-            "name": "Azure Fast Transcription — MAI model (preview)",
+        "fast_mai_1": {
+            "name": "Azure Fast Transcription — MAI 1 model (preview)",
             "url": f"{_LLM_REST_BASE}?api-version={LLM_API_VERSION}",
             "transport": "HTTPS POST (multipart/form-data, chunked)",
             "config": f'definition = {{"locales": ["{locale_short}"], "enhancedMode": {{"enabled": true, "model": "mai-transcribe-1"}}}}',
             "partials": "no",
             "note": "Requires Speech resource with mai-transcribe-1 preview enabled.",
             "doc": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/mai-transcribe",
+        },
+        "fast_mai_1.5": {
+            "name": "Azure Fast Transcription — MAI 1.5 model (preview)",
+            "url": f"{_LLM_REST_BASE}?api-version={LLM_API_VERSION}",
+            "transport": "HTTPS POST (multipart/form-data, chunked)",
+            "config": f'definition = {{"locales": ["{locale_short}"], "enhancedMode": {{"enabled": true, "model": "mai-transcribe-1.5"}}}}',
+            "partials": "no",
+            "note": "Requires Speech resource with mai-transcribe-1.5 preview enabled.",
+            "doc": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/mai-transcribe",
+        },
+        "xiaomi_mimo_2.5": {
+            "name": "Xiaomi MiMo-V2.5-ASR",
+            "url": "Google Colab / local notebook export",
+            "transport": "Offline model inference",
+            "config": "MiMoAudio.asr_sft(audio_path, audio_tag=\"<english>\")",
+            "partials": "no",
+            "note": "Rows are imported from the Colab export; latency fields are not directly comparable unless measured in the notebook.",
+            "doc": "https://github.com/XiaomiMiMo/MiMo-V2.5-ASR",
         },
         "realtime": {
             "name": "Azure Speech SDK — continuous recognition",
@@ -78,6 +96,33 @@ def _endpoints_for_locale(locale: str) -> dict[str, dict]:
             "config": f'definition = {{"locales": ["{locale}"], "model": "whisper-large-v3"}}',
             "partials": "no",
             "doc": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/fast-transcription-create",
+        },
+        "hojo_asr": {
+            "name": "HojoAI Hojo-ASR-V1",
+            "url": "Local Azure GPU / offline model inference",
+            "transport": "Local Python inference via hojo-asr",
+            "config": "HOJO_MODEL_PATH=/path/to/Hojo-ASR-V1 HOJO_DEVICE=cuda:0",
+            "partials": "no",
+            "note": "Model card lists Mandarin, English, Cantonese, and Sichuan dialect support; European-language results should be treated as out-of-coverage unless validated empirically.",
+            "doc": "https://huggingface.co/HojoAI/Hojo-ASR-V1",
+        },
+        "foundry_whisper_v3": {
+            "name": "Foundry Local — Whisper large-v3 turbo",
+            "url": "Local Foundry model runtime",
+            "transport": "Foundry Local Python SDK audio_client.transcribe(file)",
+            "config": "FOUNDRY_WHISPER_MODEL_ALIAS=whisper-large-v3-turbo",
+            "partials": "no",
+            "note": "The current Foundry Local catalog exposes Whisper V3 as `whisper-large-v3-turbo`; set FOUNDRY_WHISPER_MODEL_ALIAS to override if a different V3 alias is available.",
+            "doc": "https://learn.microsoft.com/en-us/azure/foundry-local/how-to/how-to-transcribe-audio",
+        },
+        "foundry_nemotron_asr": {
+            "name": "Foundry Local — Nemotron ASR streaming",
+            "url": "Local Foundry model runtime",
+            "transport": "Foundry Local Python SDK live transcription session over 16 kHz mono PCM",
+            "config": f"FOUNDRY_NEMOTRON_MODEL_ALIAS=nemotron-3.5-asr-streaming-0.6b language={locale_short}",
+            "partials": "yes (streaming session; CSV stores final text)",
+            "note": "Set FOUNDRY_LANGUAGE=auto to force Foundry Local auto-detection instead of the benchmark locale's language subtag.",
+            "doc": "https://learn.microsoft.com/en-us/azure/foundry-local/how-to/how-to-live-transcribe-audio",
         },
     }
 
@@ -128,7 +173,7 @@ def build_report(csv_path: Path, md_path: Path) -> None:
     endpoints = _endpoints_for_locale(locale)
     lines.append("## Endpoints under test")
     lines.append("")
-    services_in_run = [s for s in ("fast_default", "fast_llm", "fast_mai", "realtime", "realtime_refine")
+    services_in_run = [s for s in ("fast_default", "fast_llm", "fast_mai_1", "fast_mai_1.5", "realtime", "realtime_refine", "whisper_v3", "foundry_whisper_v3", "foundry_nemotron_asr", "hojo_asr", "xiaomi_mimo_2.5")
                        if any(r["service"] == s for r in rows)]
     for svc in services_in_run:
         e = endpoints[svc]
@@ -151,7 +196,7 @@ def build_report(csv_path: Path, md_path: Path) -> None:
         parts = ds.rsplit("_", 1)
         loc_name = parts[0] if len(parts) == 2 else ds
         scn = parts[1] if len(parts) == 2 else ""
-        lines.append(f"- **{ds}** — Mazda {loc_name} {scn} voice commands (male + female pooled, 30 random samples)")
+        lines.append(f"- **{ds}** — Mazda {loc_name} {scn} voice commands (male + female pooled)")
     lines.append("")
 
     # Results table
@@ -262,12 +307,20 @@ def build_report(csv_path: Path, md_path: Path) -> None:
     lines.append("- **LBL** (last-final beyond last-chunk) = `last_recognized_event_wall − end_of_audio`. Pure server flush time relative to the last byte we pushed. **May be negative** when the SDK emits the final result before the last chunk goes out — that's the streaming pipeline running ahead of audio I/O.")
     lines.append("- **UPL** (user-perceived latency) = `last_recognized_event_wall − speech_end`. How late the final result arrives after the user actually stopped speaking. `speech_end` comes from the last word's `Offset + Duration` in the recognized event JSON.")
     lines.append("")
-    lines.append("**fast_default / fast_llm / fast_mai** (REST, no partials):")
+    lines.append("**fast_default / fast_llm / fast_mai_1 / fast_mai_1.5 / whisper_v3** (REST, no partials):")
     lines.append("- **LBL** = `response_fully_read_wall − end_of_audio_wall`. Time from last uploaded byte to fully-received response.")
     lines.append("- **UPL** = `response_fully_read_wall − speech_end_wall`. `speech_end_wall` is taken from the realtime SDK's last-word offset for that sample (when realtime ran successfully on it), so all services compare against the same reference. The CSV column `upl_self_ms` keeps each service's own phrase-derived value, and `upl_anchor` is `realtime` when anchored or `self` when the realtime anchor was unavailable.")
-    lines.append("- Note: `fast_mai`'s own phrase boundaries often span the entire audio; using the realtime anchor here makes its UPL directly comparable to the others.")
+    lines.append("- Note: MAI phrase boundaries often span the entire audio; using the realtime anchor here makes UPL directly comparable across services.")
     lines.append("- **First Latency** is omitted because the REST response is delivered in one shot — there is no first-token signal to measure against.")
     lines.append(f"- **VAD truncation**: when realtime ran first and produced word timestamps, fast_* audio is truncated at `speech_end + {SEGMENTATION_SILENCE_MS} ms` to simulate a VAD cutting the stream after end-of-speech. This reduces upload time and makes LBL/UPL realistic for a VAD-equipped pipeline. The CSV column `vad_truncated_s` records the truncated duration (blank when no truncation was applied).")
+    lines.append("")
+    lines.append("**hojo_asr** (offline model, no partials):")
+    lines.append("- **LBL** = local `model.run_infer` wall time after the model is already loaded. First-sample model load time is excluded from the row latency.")
+    lines.append("- **UPL** is omitted unless a service-specific streaming boundary is added later; compare Hojo accuracy against the other services first, then run a separate throughput pass for GPU sizing.")
+    lines.append("")
+    lines.append("**foundry_whisper_v3 / foundry_nemotron_asr** (Foundry Local, local runtime):")
+    lines.append("- **LBL** = local Foundry SDK transcription wall time after the model is already loaded. First-sample model download/load time is excluded from the row latency.")
+    lines.append("- **UPL** is omitted because these rows currently measure offline/local inference wall time, not a VAD-anchored user-perceived streaming pipeline.")
     lines.append("")
     lines.append("**Other:**")
     lines.append("- WER/SER use NFKC + lowercase + punctuation stripping normalization.")

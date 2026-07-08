@@ -11,7 +11,11 @@ from tqdm import tqdm
 
 from . import boundary_fix
 from .asr_fast import transcribe_fast_default
-from .asr_llm_speech import transcribe_fast_llm, transcribe_fast_mai
+from .asr_foundry_local import (transcribe_foundry_nemotron_asr,
+                                transcribe_foundry_whisper_v3)
+from .asr_hojo import transcribe_hojo_asr
+from .asr_llm_speech import (transcribe_fast_llm, transcribe_fast_mai_1,
+                             transcribe_fast_mai_1_5)
 from .asr_realtime import transcribe_realtime, transcribe_realtime_refine
 from .asr_whisper import transcribe_whisper_v3
 from .config import SERVICES, AsrResult, Sample
@@ -20,10 +24,14 @@ from .metrics import wer, wer_breakdown, sentence_error
 ADAPTERS = {
     "fast_default": transcribe_fast_default,
     "fast_llm": transcribe_fast_llm,
-    "fast_mai": transcribe_fast_mai,
+    "fast_mai_1": transcribe_fast_mai_1,
+    "fast_mai_1.5": transcribe_fast_mai_1_5,
     "realtime": transcribe_realtime,
     "realtime_refine": transcribe_realtime_refine,
     "whisper_v3": transcribe_whisper_v3,
+    "foundry_whisper_v3": transcribe_foundry_whisper_v3,
+    "foundry_nemotron_asr": transcribe_foundry_nemotron_asr,
+    "hojo_asr": transcribe_hojo_asr,
 }
 
 CSV_FIELDS = [
@@ -36,6 +44,7 @@ CSV_FIELDS = [
     "speech_start_s", "speech_end_s", "boundary_fix_action",
     "first_word_start_s", "last_word_end_s",
     "vad_truncated_s",
+    "request_id", "session_id",
     "error",
 ]
 
@@ -94,6 +103,8 @@ def _to_row(sample: Sample, res: AsrResult) -> dict:
         "first_word_start_s": round(res.first_word_start_s, 3) if res.first_word_start_s is not None else "",
         "last_word_end_s": round(res.last_word_end_s, 3) if res.last_word_end_s is not None else "",
         "vad_truncated_s": round(res.vad_truncated_s, 3) if res.vad_truncated_s is not None else "",
+        "request_id": res.request_id or "",
+        "session_id": res.session_id or "",
         "error": res.error or "",
     }
 
@@ -128,6 +139,8 @@ def _run_sample(sample: Sample, services: tuple[str, ...], pace: bool,
                     "anchored_first_word_start_s": anchored_first,
                     "anchored_last_word_end_s": anchored_last,
                     "boundary_fix": fix_meta,
+                    "request_id": res.request_id,
+                    "session_id": res.session_id,
                 })
         else:
             sample.boundary_fix = {"action": "skip", "reason": f"realtime error: {res.error}"}

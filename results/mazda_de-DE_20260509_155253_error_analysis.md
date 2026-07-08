@@ -30,55 +30,64 @@ INS/DEL/SUB are *rates per 100 reference words*. Their sum ≈ WER × 100.
 |---|---|---:|---:|---:|---:|---:|---:|---|---|
 | de-DE_DT1 | fast_default | 30 | 0.597 | 0.867 | 7.1 | 26.8 | 26.8 | 614 / 755 | 1554 / 2550 |
 | de-DE_DT1 | fast_llm | 30 | 0.614 | 0.867 | 17.3 | 22.8 | 39.4 | 483 / 548 | 1438 / 2272 |
-| de-DE_DT1 | fast_mai | 30 | 0.543 | 0.800 | 9.4 | 23.6 | 25.2 | 463 / 500 | 810 / 1050 |
+| de-DE_DT1 | fast_mai_1 | 30 | 0.543 | 0.800 | 9.4 | 23.6 | 25.2 | 463 / 500 | 810 / 1050 |
+| de-DE_DT1 | fast_mai_1.5 | 30 | 0.557 | 0.833 | 11.0 | 21.3 | 27.6 | 1013 / 1095 | 1055 / 1139 |
 | de-DE_DT1 | realtime | 30 | 0.629 | 0.867 | 5.5 | 41.7 | 15.7 | -1185 / -581 | 707 / 897 |
 | de-DE_DT1 | realtime_refine | 30 | 0.553 | 0.800 | 5.5 | 26.0 | 26.0 | -783 / -148 | 1220 / 1489 |
 | de-DE_DT1 | whisper_v3 | 30 | 0.597 | 0.867 | 7.1 | 26.8 | 26.8 | 603 / 681 | 1545 / 2551 |
 | de-DE_DT2 | fast_default | 30 | 0.667 | 0.867 | 11.8 | 25.2 | 37.0 | 605 / 679 | 1818 / 2983 |
 | de-DE_DT2 | fast_llm | 30 | 0.703 | 0.833 | 22.0 | 20.5 | 43.3 | 491 / 543 | 1728 / 3613 |
-| de-DE_DT2 | fast_mai | 30 | 0.589 | 0.800 | 25.2 | 15.7 | 38.6 | 484 / 606 | 764 / 1064 |
+| de-DE_DT2 | fast_mai_1 | 30 | 0.589 | 0.800 | 25.2 | 15.7 | 38.6 | 484 / 606 | 764 / 1064 |
+| de-DE_DT2 | fast_mai_1.5 | 30 | 0.639 | 0.767 | 26.0 | 15.7 | 41.7 | 992 / 1078 | 1033 / 1102 |
 | de-DE_DT2 | realtime | 30 | 0.720 | 0.933 | 0.0 | 56.7 | 12.6 | -1070 / -522 | 839 / 1024 |
 | de-DE_DT2 | realtime_refine | 30 | 0.629 | 0.900 | 14.2 | 26.8 | 29.9 | -911 / -177 | 1244 / 1495 |
 | de-DE_DT2 | whisper_v3 | 30 | 0.667 | 0.867 | 11.8 | 25.2 | 37.0 | 615 / 669 | 1821 / 3048 |
 | de-DE_DT3 | fast_default | 30 | 0.494 | 0.700 | 7.9 | 18.1 | 24.4 | 617 / 757 | 1411 / 2670 |
 | de-DE_DT3 | fast_llm | 30 | 0.450 | 0.667 | 12.6 | 17.3 | 22.8 | 498 / 593 | 1337 / 2636 |
-| de-DE_DT3 | fast_mai | 30 | 0.390 | 0.600 | 7.1 | 15.7 | 22.8 | 475 / 528 | 911 / 1068 |
+| de-DE_DT3 | fast_mai_1 | 30 | 0.390 | 0.600 | 7.1 | 15.7 | 22.8 | 475 / 528 | 911 / 1068 |
+| de-DE_DT3 | fast_mai_1.5 | 30 | 0.439 | 0.667 | 11.8 | 12.6 | 24.4 | 1012 / 1093 | 1053 / 1133 |
 | de-DE_DT3 | realtime | 30 | 0.521 | 0.767 | 5.5 | 30.7 | 12.6 | -1182 / -511 | 706 / 882 |
 | de-DE_DT3 | realtime_refine | 30 | 0.385 | 0.667 | 3.1 | 20.5 | 14.2 | -803 / -117 | 1221 / 1379 |
 | de-DE_DT3 | whisper_v3 | 30 | 0.494 | 0.700 | 7.9 | 18.1 | 24.4 | 629 / 752 | 1425 / 2714 |
 | de-DE_DT4 | fast_default | 30 | 0.733 | 0.833 | 7.1 | 40.2 | 34.6 | 598 / 751 | 1678 / 3024 |
 | de-DE_DT4 | fast_llm | 30 | 0.774 | 0.900 | 25.2 | 22.8 | 51.2 | 486 / 570 | 1794 / 2970 |
-| de-DE_DT4 | fast_mai | 30 | 0.631 | 0.900 | 5.5 | 30.7 | 29.9 | 468 / 559 | 742 / 1027 |
+| de-DE_DT4 | fast_mai_1 | 30 | 0.631 | 0.900 | 5.5 | 30.7 | 29.9 | 468 / 559 | 742 / 1027 |
+| de-DE_DT4 | fast_mai_1.5 | 30 | 0.688 | 0.933 | 18.9 | 18.1 | 48.8 | 1014 / 1120 | 1055 / 1151 |
 | de-DE_DT4 | realtime | 30 | 0.778 | 0.900 | 3.1 | 64.6 | 13.4 | -1082 / -570 | 777 / 915 |
 | de-DE_DT4 | realtime_refine | 30 | 0.679 | 0.767 | 19.7 | 29.1 | 40.2 | -671 / -24 | 1261 / 1512 |
 | de-DE_DT4 | whisper_v3 | 30 | 0.733 | 0.833 | 7.1 | 40.2 | 34.6 | 592 / 710 | 1663 / 3016 |
 | de-DE_DT5 | fast_default | 30 | 0.468 | 0.667 | 3.1 | 22.0 | 19.7 | 591 / 648 | 1362 / 2473 |
 | de-DE_DT5 | fast_llm | 30 | 0.485 | 0.733 | 9.4 | 20.5 | 26.8 | 484 / 558 | 1366 / 2694 |
-| de-DE_DT5 | fast_mai | 30 | 0.399 | 0.700 | 5.5 | 16.5 | 22.0 | 476 / 541 | 928 / 1094 |
+| de-DE_DT5 | fast_mai_1 | 30 | 0.399 | 0.700 | 5.5 | 16.5 | 22.0 | 476 / 541 | 928 / 1094 |
+| de-DE_DT5 | fast_mai_1.5 | 30 | 0.382 | 0.600 | 6.3 | 13.4 | 21.3 | 1001 / 1106 | 1042 / 1147 |
 | de-DE_DT5 | realtime | 30 | 0.497 | 0.700 | 4.7 | 27.6 | 16.5 | -1170 / -487 | 791 / 1044 |
 | de-DE_DT5 | realtime_refine | 30 | 0.423 | 0.667 | 3.1 | 23.6 | 13.4 | -702 / -23 | 1216 / 1472 |
 | de-DE_DT5 | whisper_v3 | 30 | 0.468 | 0.667 | 3.1 | 22.0 | 19.7 | 570 / 631 | 1338 / 2491 |
 | de-DE_JT1 | fast_default | 30 | 0.414 | 0.600 | 3.9 | 22.0 | 14.2 | 620 / 732 | 1205 / 1233 |
 | de-DE_JT1 | fast_llm | 30 | 0.387 | 0.600 | 3.1 | 15.7 | 16.5 | 494 / 541 | 1279 / 1734 |
-| de-DE_JT1 | fast_mai | 30 | 0.329 | 0.533 | 4.7 | 17.3 | 11.8 | 492 / 607 | 955 / 1135 |
+| de-DE_JT1 | fast_mai_1 | 30 | 0.329 | 0.533 | 4.7 | 17.3 | 11.8 | 492 / 607 | 955 / 1135 |
+| de-DE_JT1 | fast_mai_1.5 | 30 | 0.369 | 0.567 | 14.2 | 13.4 | 20.5 | 1062 / 1231 | 1103 / 1261 |
 | de-DE_JT1 | realtime | 30 | 0.391 | 0.600 | 5.5 | 24.4 | 9.4 | -1126 / -488 | 737 / 990 |
 | de-DE_JT1 | realtime_refine | 30 | 0.402 | 0.600 | 2.4 | 22.0 | 15.0 | -822 / -40 | 1173 / 1246 |
 | de-DE_JT1 | whisper_v3 | 30 | 0.414 | 0.600 | 3.9 | 22.0 | 14.2 | 607 / 683 | 1190 / 1223 |
 | de-DE_JT2 | fast_default | 30 | 0.682 | 0.767 | 11.8 | 26.0 | 37.0 | 602 / 674 | 1591 / 2600 |
 | de-DE_JT2 | fast_llm | 30 | 0.658 | 0.867 | 16.5 | 16.5 | 48.8 | 484 / 538 | 1710 / 3834 |
-| de-DE_JT2 | fast_mai | 30 | 0.600 | 0.800 | 6.3 | 31.5 | 26.0 | 498 / 604 | 818 / 1134 |
+| de-DE_JT2 | fast_mai_1 | 30 | 0.600 | 0.800 | 6.3 | 31.5 | 26.0 | 498 / 604 | 818 / 1134 |
+| de-DE_JT2 | fast_mai_1.5 | 30 | 0.647 | 0.800 | 17.3 | 20.5 | 40.2 | 1007 / 1104 | 1048 / 1172 |
 | de-DE_JT2 | realtime | 30 | 0.733 | 0.833 | 7.9 | 52.0 | 15.7 | -1083 / -510 | 736 / 944 |
 | de-DE_JT2 | realtime_refine | 30 | 0.550 | 0.733 | 5.5 | 28.3 | 24.4 | -702 / -150 | 1226 / 1314 |
 | de-DE_JT2 | whisper_v3 | 30 | 0.682 | 0.767 | 11.8 | 26.0 | 37.0 | 612 / 721 | 1605 / 2603 |
 | de-DE_JT3 | fast_default | 30 | 0.342 | 0.567 | 1.6 | 21.3 | 7.9 | 566 / 650 | 1193 / 1216 |
 | de-DE_JT3 | fast_llm | 30 | 0.335 | 0.500 | 13.4 | 19.7 | 9.4 | 487 / 596 | 1070 / 1126 |
-| de-DE_JT3 | fast_mai | 30 | 0.274 | 0.433 | 0.8 | 20.5 | 5.5 | 499 / 602 | 954 / 1099 |
+| de-DE_JT3 | fast_mai_1 | 30 | 0.274 | 0.433 | 0.8 | 20.5 | 5.5 | 499 / 602 | 954 / 1099 |
+| de-DE_JT3 | fast_mai_1.5 | 30 | 0.295 | 0.433 | 3.1 | 19.7 | 6.3 | 991 / 1083 | 1032 / 1124 |
 | de-DE_JT3 | realtime | 30 | 0.340 | 0.533 | 2.4 | 25.2 | 7.1 | -1124 / -478 | 758 / 933 |
 | de-DE_JT3 | realtime_refine | 30 | 0.308 | 0.533 | 0.8 | 20.5 | 7.9 | -726 / -243 | 1155 / 1344 |
 | de-DE_JT3 | whisper_v3 | 30 | 0.342 | 0.567 | 1.6 | 21.3 | 7.9 | 569 / 670 | 1203 / 1256 |
 | de-DE_JT4 | fast_default | 30 | 0.371 | 0.533 | 1.6 | 26.8 | 5.5 | 606 / 719 | 1226 / 1300 |
 | de-DE_JT4 | fast_llm | 30 | 0.394 | 0.533 | 6.3 | 19.7 | 14.2 | 470 / 543 | 1264 / 1806 |
-| de-DE_JT4 | fast_mai | 30 | 0.310 | 0.467 | 3.1 | 17.3 | 12.6 | 547 / 660 | 979 / 1242 |
+| de-DE_JT4 | fast_mai_1 | 30 | 0.310 | 0.467 | 3.1 | 17.3 | 12.6 | 547 / 660 | 979 / 1242 |
+| de-DE_JT4 | fast_mai_1.5 | 30 | 0.317 | 0.500 | 3.9 | 18.9 | 9.4 | 1009 / 1129 | 1050 / 1219 |
 | de-DE_JT4 | realtime | 30 | 0.409 | 0.633 | 4.7 | 26.8 | 7.9 | -1095 / -460 | 712 / 891 |
 | de-DE_JT4 | realtime_refine | 30 | 0.346 | 0.533 | 1.6 | 26.8 | 5.5 | -562 / 139 | 1249 / 1469 |
 | de-DE_JT4 | whisper_v3 | 30 | 0.371 | 0.533 | 1.6 | 26.8 | 5.5 | 616 / 778 | 1237 / 1509 |
@@ -91,14 +100,14 @@ Top 10 highest-WER rows across all services:
 |---|---|---|---|---:|---|---|
 | [▶](audio/de-DE_JT3/1r_de-DE_female-JT3/Spiegel%20einklappen.wav.wav) | de-DE_JT3 | 1r_de-DE_female-JT3/Spiegel einklappen.wav | fast_llm | 7.000 | `Spiegel einklappen` | `The 2nd and 3rd editions of the book were published in 2000 and 2004.` |
 | [▶](audio/de-DE_DT1/1r_de-DE_female-DT1/Spiegel%20einklappen.wav.wav) | de-DE_DT1 | 1r_de-DE_female-DT1/Spiegel einklappen.wav | fast_llm | 6.000 | `Spiegel einklappen` | `The 2nd and 3rd editions were published in 2000 and 2002, respectively.` |
-| [▶](audio/de-DE_DT2/2r_de-DE_female-DT2/Beifahrersitzbel%C3%BCftung%20aktivieren.wav.wav) | de-DE_DT2 | 2r_de-DE_female-DT2/Beifahrersitzbelüftung aktivieren.wav | fast_mai | 4.500 | `Beifahrersitzbelüftung aktivieren` | `Ich war aber sehr lieb und sie sehr lieb.` |
+| [▶](audio/de-DE_DT2/2r_de-DE_female-DT2/Beifahrersitzbel%C3%BCftung%20aktivieren.wav.wav) | de-DE_DT2 | 2r_de-DE_female-DT2/Beifahrersitzbelüftung aktivieren.wav | fast_mai_1 | 4.500 | `Beifahrersitzbelüftung aktivieren` | `Ich war aber sehr lieb und sie sehr lieb.` |
+| [▶](audio/de-DE_JT2/2r_de-DE_female-JT2/Beifahrersitzbel%C3%BCftung%20aktivieren.wav.wav) | de-DE_JT2 | 2r_de-DE_female-JT2/Beifahrersitzbelüftung aktivieren.wav | fast_mai_1.5 | 4.000 | `Beifahrersitzbelüftung aktivieren` | `Sein Tag hat sich gelohnt, als er fiel.` |
 | [▶](audio/de-DE_DT4/2r_de-DE_female-DT4/Leistungsmodus%20auf%20schwach%20umschalten.wav.wav) | de-DE_DT4 | 2r_de-DE_female-DT4/Leistungsmodus auf schwach umschalten.wav | fast_llm | 3.750 | `Leistungsmodus auf schwach umschalten` | `The 2nd and last day of the festival is the day of the grand procession.` |
 | [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Anruf%20ignorieren.wav.wav) | de-DE_DT2 | 1l_de-DE_male-DT2/Anruf ignorieren.wav | fast_llm | 3.500 | `Anruf ignorieren` | `¿A no que no se te moviera?` |
 | [▶](audio/de-DE_DT5/2r_de-DE_female-DT5/Beifahrersitzbel%C3%BCftung%20aktivieren.wav.wav) | de-DE_DT5 | 2r_de-DE_female-DT5/Beifahrersitzbelüftung aktivieren.wav | fast_llm | 3.500 | `Beifahrersitzbelüftung aktivieren` | `I thought I could live to graduate.` |
+| [▶](audio/de-DE_DT2/2r_de-DE_female-DT2/Beifahrersitzbel%C3%BCftung%20aktivieren.wav.wav) | de-DE_DT2 | 2r_de-DE_female-DT2/Beifahrersitzbelüftung aktivieren.wav | fast_mai_1.5 | 3.500 | `Beifahrersitzbelüftung aktivieren` | `Ich habe eine Frage zu der Immobilie.` |
 | [▶](audio/de-DE_DT2/1r_de-DE_female-DT2/Fahrersitz%20nach%20vorne%20schieben.wav.wav) | de-DE_DT2 | 1r_de-DE_female-DT2/Fahrersitz nach vorne schieben.wav | fast_llm | 3.250 | `Fahrersitz nach vorne schieben` | `The 2018-19 season was the 10th season of the Indian Premier League.` |
-| [▶](audio/de-DE_DT1/2r_de-DE_female-DT1/Beifahrersitzbel%C3%BCftung%20aktivieren.wav.wav) | de-DE_DT1 | 2r_de-DE_female-DT1/Beifahrersitzbelüftung aktivieren.wav | fast_mai | 3.000 | `Beifahrersitzbelüftung aktivieren` | `Sei feierlich und lebe zum Reichtum!` |
-| [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Anruf%20ignorieren.wav.wav) | de-DE_DT2 | 1l_de-DE_male-DT2/Anruf ignorieren.wav | realtime_refine | 3.000 | `Anruf ignorieren` | `I'm going to ignore video.` |
-| [▶](audio/de-DE_DT2/1l_de-DE_male-DT2/Anruf%20ignorieren.wav.wav) | de-DE_DT2 | 1l_de-DE_male-DT2/Anruf ignorieren.wav | fast_mai | 3.000 | `Anruf ignorieren` | `Angefangen habe ich nur wegen ihrer` |
+| [▶](audio/de-DE_JT1/1r_de-DE_female-JT1/Hinteres%20Fenster%20auf%2060%20%25%20%C3%B6ffnen.wav.wav) | de-DE_JT1 | 1r_de-DE_female-JT1/Hinteres Fenster auf 60 % öffnen.wav | fast_mai_1.5 | 3.200 | `Hinteres Fenster auf 60 % öffnen` | `Ich habe es gesehen auf Facebook und dann dachte ich mir, das ist doch ein bisschen komisch.` |
 
 ## Most common substitution patterns
 
@@ -106,21 +115,21 @@ Equal-length ref/hyp word-level substitutions (across all services):
 
 | Count | Reference word | Hypothesis word |
 |---:|---|---|
-| 18 | `vorn` | `vorne` |
+| 21 | `vorn` | `vorne` |
 | 15 | `3` | `drei` |
-| 11 | `fahrersitzlehne` | `fahrradpläne` |
-| 10 | `um` | `in` |
+| 13 | `fahrersitzlehne` | `fahrradpläne` |
+| 12 | `um` | `in` |
 | 10 | `außenluftzirkulation` | `aussenluftzirkulation` |
-| 7 | `ausrichten` | `aufrichten` |
+| 8 | `ausrichten` | `aufrichten` |
+| 7 | `telefonlautstärke` | `lautstärke` |
+| 6 | `öffnen` | `prozent` |
+| 6 | `schließen` | `schließt` |
 | 6 | `wechsel` | `wechsele` |
-| 5 | `telefonlautstärke` | `lautstärke` |
+| 5 | `schließen` | `schieben` |
 | 5 | `weiter` | `etwas` |
 | 5 | `öffnen` | `weiter` |
 | 5 | `stellen` | `die` |
-| 5 | `öffnen` | `prozent` |
-| 5 | `schließen` | `schließt` |
-| 4 | `schließen` | `schieben` |
-| 4 | `sie` | `h` |
+| 5 | `beifahrersitzbelüftung` | `sitzbelüftung` |
 
 ## fast_llm hallucinations
 
@@ -226,7 +235,8 @@ Found **89** likely hallucinations (WER ≥ 0.8 and ≤ 1 word overlap with refe
 - ref:           `Klimamenü öffnen`
 - fast_default   `Lima-Menü öffnen`
 - fast_llm       `Klimamenü öffnen.`
-- fast_mai       `Klimamenü öffnen.`
+- fast_mai_1     `Klimamenü öffnen.`
+- fast_mai_1.5   `Klimamenü öffnen.`
 - realtime       `Klimamenü.Öffnen.`
 - realtime_refine `Klimamenü öffnen`
 - whisper_v3     `Lima-Menü öffnen`
@@ -235,7 +245,8 @@ Found **89** likely hallucinations (WER ≥ 0.8 and ≤ 1 word overlap with refe
 - ref:           `Beifahrersitzbelüftung auf Maximum`
 - fast_default   `Beifahrersitzbelüftung auf Maximum.`
 - fast_llm       `Beifahrersitzbelüftung auf Maximum.`
-- fast_mai       `Beifahrersitzbelüftung auf Maximum.`
+- fast_mai_1     `Beifahrersitzbelüftung auf Maximum.`
+- fast_mai_1.5   `Beifahrersitzbelüftung auf Maximum.`
 - realtime       `Beifahrer Sitzbelüftung auf maximal.`
 - realtime_refine `Beifahrersitzbelüftung auf Maximum`
 - whisper_v3     `Beifahrersitzbelüftung auf Maximum.`
@@ -244,7 +255,8 @@ Found **89** likely hallucinations (WER ≥ 0.8 and ≤ 1 word overlap with refe
 - ref:           `Außenluftzirkulation einschalten`
 - fast_default   `Außenluftzirkulation einschalten.`
 - fast_llm       `Außenluftzirkulation einschalten`
-- fast_mai       `Außenluftzirkulation einschalten.`
+- fast_mai_1     `Außenluftzirkulation einschalten.`
+- fast_mai_1.5   `Russenluftzirkulation einschalten.`
 - realtime       `Großen Luftzirkulation einstellen.`
 - realtime_refine `Außenluftzirkulation einschalten.`
 - whisper_v3     `Außenluftzirkulation einschalten.`
@@ -253,7 +265,8 @@ Found **89** likely hallucinations (WER ≥ 0.8 and ≤ 1 word overlap with refe
 - ref:           `Beifahrersitzbelüftung aktivieren`
 - fast_default   `Beifahrersitzbelüftung aktivieren.`
 - fast_llm       `Bei Fahrer wird Belüftung aktivieren.`
-- fast_mai       `Beifahrersitzbelüftung aktivieren.`
+- fast_mai_1     `Beifahrersitzbelüftung aktivieren.`
+- fast_mai_1.5   `Sei fahre, Sitzbelüftung aktivieren.`
 - realtime       `Beifahrer wird Belüftung aktivieren.`
 - realtime_refine `Beifahrerblitzbelüftung aktivieren`
 - whisper_v3     `Beifahrersitzbelüftung aktivieren.`
@@ -262,7 +275,8 @@ Found **89** likely hallucinations (WER ≥ 0.8 and ≤ 1 word overlap with refe
 - ref:           `Farbe der Ambientebeleuchtung ändern`
 - fast_default   `Farbe der Ambientebeleuchtung ändern.`
 - fast_llm       `Farbe der Ambiente-Beleuchtung ändern.`
-- fast_mai       `Farbe der Ambientebeleuchtung ändern.`
+- fast_mai_1     `Farbe der Ambientebeleuchtung ändern.`
+- fast_mai_1.5   `Farbe der Ambientebeleuchtung ändern.`
 - realtime       `Aber der Ambiente Beleuchtung ändern.`
 - realtime_refine `Farbe der Ambientebeleuchtung ändern`
 - whisper_v3     `Farbe der Ambientebeleuchtung ändern.`
@@ -271,7 +285,8 @@ Found **89** likely hallucinations (WER ≥ 0.8 and ≤ 1 word overlap with refe
 - ref:           `Farbe der Ambientebeleuchtung ändern`
 - fast_default   `Farbe der Ambientebeleuchtung ändern.`
 - fast_llm       `Farbe der Ambiente-Beleuchtung ändern.`
-- fast_mai       `Farbe der Ambientebeleuchtung ändern.`
+- fast_mai_1     `Farbe der Ambientebeleuchtung ändern.`
+- fast_mai_1.5   `Farbe der Ambientebeleuchtung ändern.`
 - realtime       `Aber der Ambiente beleuchtet ändern.`
 - realtime_refine `Farbe der Ambientebeleuchtung ändern`
 - whisper_v3     `Farbe der Ambientebeleuchtung ändern.`
@@ -280,7 +295,8 @@ Found **89** likely hallucinations (WER ≥ 0.8 and ≤ 1 word overlap with refe
 - ref:           `Farbe der Ambientebeleuchtung ändern`
 - fast_default   `Farbe der Ambientebeleuchtung ändern.`
 - fast_llm       `Farbe der Ambiente-Beleuchtung ändern.`
-- fast_mai       `Farbe der Ambiente soll ein verändern.`
+- fast_mai_1     `Farbe der Ambiente soll ein verändern.`
+- fast_mai_1.5   `Habe der Ambiente vielleicht noch ändern?`
 - realtime       `Aber der Ambiente Beleuchtung ändern.`
 - realtime_refine `Farbe der Ambientebeleuchtung ändern.`
 - whisper_v3     `Farbe der Ambientebeleuchtung ändern.`
@@ -289,7 +305,8 @@ Found **89** likely hallucinations (WER ≥ 0.8 and ≤ 1 word overlap with refe
 - ref:           `Fahrersitz nach vorne schieben`
 - fast_default   `The father she no.`
 - fast_llm       `Frage schieben.`
-- fast_mai       `nach vorne schieben.`
+- fast_mai_1     `nach vorne schieben.`
+- fast_mai_1.5   `Das war der Schirm.`
 - realtime       `Nach vorne schieben.`
 - realtime_refine `vorgeschrieben`
 - whisper_v3     `The father she no.`
@@ -298,7 +315,8 @@ Found **89** likely hallucinations (WER ≥ 0.8 and ≤ 1 word overlap with refe
 - ref:           `Farbe der Ambientebeleuchtung ändern`
 - fast_default   `Farbe der Ambiente Beleuchtung ändern.`
 - fast_llm       `Farbe der Ambiente-Beleuchtung ändern.`
-- fast_mai       `Farbe der Ambientebeleuchtung ändern.`
+- fast_mai_1     `Farbe der Ambientebeleuchtung ändern.`
+- fast_mai_1.5   `Farbe der Ambientebeleuchtung ändern.`
 - realtime       `Aber der Ambiente beleuchtet ändern.`
 - realtime_refine `Farbe der Ambientebeleuchtung ändern`
 - whisper_v3     `Farbe der Ambiente Beleuchtung ändern.`
@@ -307,7 +325,8 @@ Found **89** likely hallucinations (WER ≥ 0.8 and ≤ 1 word overlap with refe
 - ref:           `Farbe der Ambientebeleuchtung ändern`
 - fast_default   `Farbe der Ambientebeleuchtung ändern.`
 - fast_llm       `Farbe der Ambiente-Beleuchtung ändern.`
-- fast_mai       `Die Farbe der Ambientebeleuchtung ändern.`
+- fast_mai_1     `Die Farbe der Ambientebeleuchtung ändern.`
+- fast_mai_1.5   `Die Farbe der Ambientebeleuchtung ändern.`
 - realtime       `Habe der Ambiente Beleuchtung ändern.`
 - realtime_refine `Farbe der Ambientebeleuchtung ändern`
 - whisper_v3     `Farbe der Ambientebeleuchtung ändern.`

@@ -11,13 +11,16 @@ def decide(reference: str, hypothesis: str,
     if not words:
         return None, None, {"action": "skip", "reason": "no words"}
 
+    fs = words[0]["start_s"]
+    le = words[-1]["end_s"]
+
+    if not normalize_text(reference):
+        return fs, le, {"action": "none", "reason": "no reference; using raw word bounds"}
+
     bd = wer_breakdown(reference, hypothesis)
     ref_len = max(bd["ref_len"], 1)
     wer_val = (bd["ins"] + bd["dele"] + bd["sub"]) / ref_len
     ins_rate = bd["ins"] / ref_len
-
-    fs = words[0]["start_s"]
-    le = words[-1]["end_s"]
 
     if wer_val <= WER_GATE and ins_rate <= INS_RATE_GATE:
         return fs, le, {"action": "none", "reason": ""}

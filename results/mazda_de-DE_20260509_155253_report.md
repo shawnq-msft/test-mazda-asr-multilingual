@@ -1,11 +1,11 @@
 # Mazda ASR Benchmark — mazda_de-DE_20260509_155253.csv
 
-Total rows: **1620**  
+Total rows: **1890**  
 Tester public IP: **167.220.233.51**  
 Tester location: **Tokyo, Tokyo, Japan** (Microsoft Corporation)  
 Azure region: **eastus**  
 Azure endpoint host: **eastus.api.cognitive.microsoft.com**  
-TCP ping to `eastus.api.cognitive.microsoft.com:443` (avg of 5): **266.1 ms**  
+TCP ping to `eastus.api.cognitive.microsoft.com:443` (avg of 5): **240.1 ms**  
 VAD set to **500 ms** (realtime `Speech_SegmentationSilenceTimeoutMs`; fast_* audio truncated at `speech_end + 500 ms`)
 
 ## Endpoints under test
@@ -25,13 +25,21 @@ VAD set to **500 ms** (realtime `Speech_SegmentationSilenceTimeoutMs`; fast_* au
 - Docs: <https://learn.microsoft.com/en-us/azure/ai-services/speech-service/llm-speech>
 - Note: Requires Speech resource with LLM-Speech preview enabled.
 
-### `fast_mai` — Azure Fast Transcription — MAI model (preview)
+### `fast_mai_1` — Azure Fast Transcription — MAI 1 model (preview)
 - URL: `https://eastus.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2025-10-15`
 - Transport: HTTPS POST (multipart/form-data, chunked)
 - Config: `definition = {"locales": ["de"], "enhancedMode": {"enabled": true, "model": "mai-transcribe-1"}}`
 - Partial results: no
 - Docs: <https://learn.microsoft.com/en-us/azure/ai-services/speech-service/mai-transcribe>
 - Note: Requires Speech resource with mai-transcribe-1 preview enabled.
+
+### `fast_mai_1.5` — Azure Fast Transcription — MAI 1.5 model (preview)
+- URL: `https://eastus.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2025-10-15`
+- Transport: HTTPS POST (multipart/form-data, chunked)
+- Config: `definition = {"locales": ["de"], "enhancedMode": {"enabled": true, "model": "mai-transcribe-1.5"}}`
+- Partial results: no
+- Docs: <https://learn.microsoft.com/en-us/azure/ai-services/speech-service/mai-transcribe>
+- Note: Requires Speech resource with mai-transcribe-1.5 preview enabled.
 
 ### `realtime` — Azure Speech SDK — continuous recognition
 - URL: `https://eastus.api.cognitive.microsoft.com`
@@ -47,6 +55,13 @@ VAD set to **500 ms** (realtime `Speech_SegmentationSilenceTimeoutMs`; fast_* au
 - Partial results: yes (recognizing/recognized events; final replaced after refinement)
 - Docs: <https://learn.microsoft.com/en-us/azure/ai-services/speech-service/how-to-recognize-speech>
 - Note: Requires Speech SDK >= 1.49.0 and a Speech resource in a region where Multi-Recognizer / Post-Stream Refinement public preview is enabled (East US / North Europe rollout). Falls back to non-MRS behavior if PostProcessingOption is not set.
+
+### `whisper_v3` — Azure Fast Transcription — Whisper large-v3
+- URL: `https://eastus.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2024-11-15`
+- Transport: HTTPS POST (multipart/form-data, chunked)
+- Config: `definition = {"locales": ["de-DE"], "model": "whisper-large-v3"}`
+- Partial results: no
+- Docs: <https://learn.microsoft.com/en-us/azure/ai-services/speech-service/fast-transcription-create>
 
 ## Datasets under test
 
@@ -68,55 +83,64 @@ WER breakdown columns are *rates per 100 reference words*. Per-row WER ≈ (INS 
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|---|---|
 | de-DE_DT1 | fast_default | 30 | 0 | 0.597 | 0.867 | 7.1 | 26.8 | 26.8 | - | 614 / 755 | 1554 / 2550 |
 | de-DE_DT1 | fast_llm | 30 | 0 | 0.614 | 0.867 | 17.3 | 22.8 | 39.4 | - | 483 / 548 | 1438 / 2272 |
-| de-DE_DT1 | fast_mai | 30 | 0 | 0.543 | 0.800 | 9.4 | 23.6 | 25.2 | - | 463 / 500 | 810 / 1050 |
+| de-DE_DT1 | fast_mai_1 | 30 | 0 | 0.543 | 0.800 | 9.4 | 23.6 | 25.2 | - | 463 / 500 | 810 / 1050 |
+| de-DE_DT1 | fast_mai_1.5 | 30 | 0 | 0.557 | 0.833 | 11.0 | 21.3 | 27.6 | - | 1013 / 1095 | 1055 / 1139 |
 | de-DE_DT1 | realtime | 30 | 0 | 0.629 | 0.867 | 5.5 | 41.7 | 15.7 | 1620 / 1923 | -1185 / -581 | 707 / 897 |
 | de-DE_DT1 | realtime_refine | 30 | 0 | 0.553 | 0.800 | 5.5 | 26.0 | 26.0 | 1582 / 1923 | -783 / -148 | 1220 / 1489 |
 | de-DE_DT1 | whisper_v3 | 30 | 0 | 0.597 | 0.867 | 7.1 | 26.8 | 26.8 | - | 603 / 681 | 1545 / 2551 |
 | de-DE_DT2 | fast_default | 30 | 0 | 0.667 | 0.867 | 11.8 | 25.2 | 37.0 | - | 605 / 679 | 1818 / 2983 |
 | de-DE_DT2 | fast_llm | 30 | 0 | 0.703 | 0.833 | 22.0 | 20.5 | 43.3 | - | 491 / 543 | 1728 / 3613 |
-| de-DE_DT2 | fast_mai | 30 | 0 | 0.589 | 0.800 | 25.2 | 15.7 | 38.6 | - | 484 / 606 | 764 / 1064 |
+| de-DE_DT2 | fast_mai_1 | 30 | 0 | 0.589 | 0.800 | 25.2 | 15.7 | 38.6 | - | 484 / 606 | 764 / 1064 |
+| de-DE_DT2 | fast_mai_1.5 | 30 | 0 | 0.639 | 0.767 | 26.0 | 15.7 | 41.7 | - | 992 / 1078 | 1033 / 1102 |
 | de-DE_DT2 | realtime | 30 | 0 | 0.720 | 0.933 | 0.0 | 56.7 | 12.6 | 1597 / 1927 | -1070 / -522 | 839 / 1024 |
 | de-DE_DT2 | realtime_refine | 30 | 0 | 0.629 | 0.900 | 14.2 | 26.8 | 29.9 | 1775 / 2907 | -911 / -177 | 1244 / 1495 |
 | de-DE_DT2 | whisper_v3 | 30 | 0 | 0.667 | 0.867 | 11.8 | 25.2 | 37.0 | - | 615 / 669 | 1821 / 3048 |
 | de-DE_DT3 | fast_default | 30 | 0 | 0.494 | 0.700 | 7.9 | 18.1 | 24.4 | - | 617 / 757 | 1411 / 2670 |
 | de-DE_DT3 | fast_llm | 30 | 0 | 0.450 | 0.667 | 12.6 | 17.3 | 22.8 | - | 498 / 593 | 1337 / 2636 |
-| de-DE_DT3 | fast_mai | 30 | 0 | 0.390 | 0.600 | 7.1 | 15.7 | 22.8 | - | 475 / 528 | 911 / 1068 |
+| de-DE_DT3 | fast_mai_1 | 30 | 0 | 0.390 | 0.600 | 7.1 | 15.7 | 22.8 | - | 475 / 528 | 911 / 1068 |
+| de-DE_DT3 | fast_mai_1.5 | 30 | 0 | 0.439 | 0.667 | 11.8 | 12.6 | 24.4 | - | 1012 / 1093 | 1053 / 1133 |
 | de-DE_DT3 | realtime | 30 | 0 | 0.521 | 0.767 | 5.5 | 30.7 | 12.6 | 1566 / 1682 | -1182 / -511 | 706 / 882 |
 | de-DE_DT3 | realtime_refine | 30 | 0 | 0.385 | 0.667 | 3.1 | 20.5 | 14.2 | 1575 / 1740 | -803 / -117 | 1221 / 1379 |
 | de-DE_DT3 | whisper_v3 | 30 | 0 | 0.494 | 0.700 | 7.9 | 18.1 | 24.4 | - | 629 / 752 | 1425 / 2714 |
 | de-DE_DT4 | fast_default | 30 | 0 | 0.733 | 0.833 | 7.1 | 40.2 | 34.6 | - | 598 / 751 | 1678 / 3024 |
 | de-DE_DT4 | fast_llm | 30 | 0 | 0.774 | 0.900 | 25.2 | 22.8 | 51.2 | - | 486 / 570 | 1794 / 2970 |
-| de-DE_DT4 | fast_mai | 30 | 0 | 0.631 | 0.900 | 5.5 | 30.7 | 29.9 | - | 468 / 559 | 742 / 1027 |
+| de-DE_DT4 | fast_mai_1 | 30 | 0 | 0.631 | 0.900 | 5.5 | 30.7 | 29.9 | - | 468 / 559 | 742 / 1027 |
+| de-DE_DT4 | fast_mai_1.5 | 30 | 0 | 0.688 | 0.933 | 18.9 | 18.1 | 48.8 | - | 1014 / 1120 | 1055 / 1151 |
 | de-DE_DT4 | realtime | 30 | 0 | 0.778 | 0.900 | 3.1 | 64.6 | 13.4 | 1623 / 1980 | -1082 / -570 | 777 / 915 |
 | de-DE_DT4 | realtime_refine | 30 | 0 | 0.679 | 0.767 | 19.7 | 29.1 | 40.2 | 1644 / 1920 | -671 / -24 | 1261 / 1512 |
 | de-DE_DT4 | whisper_v3 | 30 | 0 | 0.733 | 0.833 | 7.1 | 40.2 | 34.6 | - | 592 / 710 | 1663 / 3016 |
 | de-DE_DT5 | fast_default | 30 | 0 | 0.468 | 0.667 | 3.1 | 22.0 | 19.7 | - | 591 / 648 | 1362 / 2473 |
 | de-DE_DT5 | fast_llm | 30 | 0 | 0.485 | 0.733 | 9.4 | 20.5 | 26.8 | - | 484 / 558 | 1366 / 2694 |
-| de-DE_DT5 | fast_mai | 30 | 0 | 0.399 | 0.700 | 5.5 | 16.5 | 22.0 | - | 476 / 541 | 928 / 1094 |
+| de-DE_DT5 | fast_mai_1 | 30 | 0 | 0.399 | 0.700 | 5.5 | 16.5 | 22.0 | - | 476 / 541 | 928 / 1094 |
+| de-DE_DT5 | fast_mai_1.5 | 30 | 0 | 0.382 | 0.600 | 6.3 | 13.4 | 21.3 | - | 1001 / 1106 | 1042 / 1147 |
 | de-DE_DT5 | realtime | 30 | 0 | 0.497 | 0.700 | 4.7 | 27.6 | 16.5 | 1593 / 1658 | -1170 / -487 | 791 / 1044 |
 | de-DE_DT5 | realtime_refine | 30 | 0 | 0.423 | 0.667 | 3.1 | 23.6 | 13.4 | 1495 / 1633 | -702 / -23 | 1216 / 1472 |
 | de-DE_DT5 | whisper_v3 | 30 | 0 | 0.468 | 0.667 | 3.1 | 22.0 | 19.7 | - | 570 / 631 | 1338 / 2491 |
 | de-DE_JT1 | fast_default | 30 | 0 | 0.414 | 0.600 | 3.9 | 22.0 | 14.2 | - | 620 / 732 | 1205 / 1233 |
 | de-DE_JT1 | fast_llm | 30 | 0 | 0.387 | 0.600 | 3.1 | 15.7 | 16.5 | - | 494 / 541 | 1279 / 1734 |
-| de-DE_JT1 | fast_mai | 30 | 0 | 0.329 | 0.533 | 4.7 | 17.3 | 11.8 | - | 492 / 607 | 955 / 1135 |
+| de-DE_JT1 | fast_mai_1 | 30 | 0 | 0.329 | 0.533 | 4.7 | 17.3 | 11.8 | - | 492 / 607 | 955 / 1135 |
+| de-DE_JT1 | fast_mai_1.5 | 30 | 0 | 0.369 | 0.567 | 14.2 | 13.4 | 20.5 | - | 1062 / 1231 | 1103 / 1261 |
 | de-DE_JT1 | realtime | 30 | 0 | 0.391 | 0.600 | 5.5 | 24.4 | 9.4 | 1472 / 1688 | -1126 / -488 | 737 / 990 |
 | de-DE_JT1 | realtime_refine | 30 | 0 | 0.402 | 0.600 | 2.4 | 22.0 | 15.0 | 1454 / 1637 | -822 / -40 | 1173 / 1246 |
 | de-DE_JT1 | whisper_v3 | 30 | 0 | 0.414 | 0.600 | 3.9 | 22.0 | 14.2 | - | 607 / 683 | 1190 / 1223 |
 | de-DE_JT2 | fast_default | 30 | 0 | 0.682 | 0.767 | 11.8 | 26.0 | 37.0 | - | 602 / 674 | 1591 / 2600 |
 | de-DE_JT2 | fast_llm | 30 | 0 | 0.658 | 0.867 | 16.5 | 16.5 | 48.8 | - | 484 / 538 | 1710 / 3834 |
-| de-DE_JT2 | fast_mai | 30 | 0 | 0.600 | 0.800 | 6.3 | 31.5 | 26.0 | - | 498 / 604 | 818 / 1134 |
+| de-DE_JT2 | fast_mai_1 | 30 | 0 | 0.600 | 0.800 | 6.3 | 31.5 | 26.0 | - | 498 / 604 | 818 / 1134 |
+| de-DE_JT2 | fast_mai_1.5 | 30 | 0 | 0.647 | 0.800 | 17.3 | 20.5 | 40.2 | - | 1007 / 1104 | 1048 / 1172 |
 | de-DE_JT2 | realtime | 30 | 0 | 0.733 | 0.833 | 7.9 | 52.0 | 15.7 | 1542 / 1650 | -1083 / -510 | 736 / 944 |
 | de-DE_JT2 | realtime_refine | 30 | 0 | 0.550 | 0.733 | 5.5 | 28.3 | 24.4 | 1566 / 1733 | -702 / -150 | 1226 / 1314 |
 | de-DE_JT2 | whisper_v3 | 30 | 0 | 0.682 | 0.767 | 11.8 | 26.0 | 37.0 | - | 612 / 721 | 1605 / 2603 |
 | de-DE_JT3 | fast_default | 30 | 0 | 0.342 | 0.567 | 1.6 | 21.3 | 7.9 | - | 566 / 650 | 1193 / 1216 |
 | de-DE_JT3 | fast_llm | 30 | 0 | 0.335 | 0.500 | 13.4 | 19.7 | 9.4 | - | 487 / 596 | 1070 / 1126 |
-| de-DE_JT3 | fast_mai | 30 | 0 | 0.274 | 0.433 | 0.8 | 20.5 | 5.5 | - | 499 / 602 | 954 / 1099 |
+| de-DE_JT3 | fast_mai_1 | 30 | 0 | 0.274 | 0.433 | 0.8 | 20.5 | 5.5 | - | 499 / 602 | 954 / 1099 |
+| de-DE_JT3 | fast_mai_1.5 | 30 | 0 | 0.295 | 0.433 | 3.1 | 19.7 | 6.3 | - | 991 / 1083 | 1032 / 1124 |
 | de-DE_JT3 | realtime | 30 | 0 | 0.340 | 0.533 | 2.4 | 25.2 | 7.1 | 1427 / 1633 | -1124 / -478 | 758 / 933 |
 | de-DE_JT3 | realtime_refine | 30 | 0 | 0.308 | 0.533 | 0.8 | 20.5 | 7.9 | 1519 / 1646 | -726 / -243 | 1155 / 1344 |
 | de-DE_JT3 | whisper_v3 | 30 | 0 | 0.342 | 0.567 | 1.6 | 21.3 | 7.9 | - | 569 / 670 | 1203 / 1256 |
 | de-DE_JT4 | fast_default | 30 | 0 | 0.371 | 0.533 | 1.6 | 26.8 | 5.5 | - | 606 / 719 | 1226 / 1300 |
 | de-DE_JT4 | fast_llm | 30 | 0 | 0.394 | 0.533 | 6.3 | 19.7 | 14.2 | - | 470 / 543 | 1264 / 1806 |
-| de-DE_JT4 | fast_mai | 30 | 0 | 0.310 | 0.467 | 3.1 | 17.3 | 12.6 | - | 547 / 660 | 979 / 1242 |
+| de-DE_JT4 | fast_mai_1 | 30 | 0 | 0.310 | 0.467 | 3.1 | 17.3 | 12.6 | - | 547 / 660 | 979 / 1242 |
+| de-DE_JT4 | fast_mai_1.5 | 30 | 0 | 0.317 | 0.500 | 3.9 | 18.9 | 9.4 | - | 1009 / 1129 | 1050 / 1219 |
 | de-DE_JT4 | realtime | 30 | 0 | 0.409 | 0.633 | 4.7 | 26.8 | 7.9 | 1505 / 1666 | -1095 / -460 | 712 / 891 |
 | de-DE_JT4 | realtime_refine | 30 | 0 | 0.346 | 0.533 | 1.6 | 26.8 | 5.5 | 1516 / 1720 | -562 / 139 | 1249 / 1469 |
 | de-DE_JT4 | whisper_v3 | 30 | 0 | 0.371 | 0.533 | 1.6 | 26.8 | 5.5 | - | 616 / 778 | 1237 / 1509 |
@@ -189,10 +213,10 @@ Reference points on the timeline:
 - **LBL** (last-final beyond last-chunk) = `last_recognized_event_wall − end_of_audio`. Pure server flush time relative to the last byte we pushed. **May be negative** when the SDK emits the final result before the last chunk goes out — that's the streaming pipeline running ahead of audio I/O.
 - **UPL** (user-perceived latency) = `last_recognized_event_wall − speech_end`. How late the final result arrives after the user actually stopped speaking. `speech_end` comes from the last word's `Offset + Duration` in the recognized event JSON.
 
-**fast_default / fast_llm / fast_mai** (REST, no partials):
+**fast_default / fast_llm / fast_mai_1 / fast_mai_1.5 / whisper_v3** (REST, no partials):
 - **LBL** = `response_fully_read_wall − end_of_audio_wall`. Time from last uploaded byte to fully-received response.
 - **UPL** = `response_fully_read_wall − speech_end_wall`. `speech_end_wall` is taken from the realtime SDK's last-word offset for that sample (when realtime ran successfully on it), so all services compare against the same reference. The CSV column `upl_self_ms` keeps each service's own phrase-derived value, and `upl_anchor` is `realtime` when anchored or `self` when the realtime anchor was unavailable.
-- Note: `fast_mai`'s own phrase boundaries often span the entire audio; using the realtime anchor here makes its UPL directly comparable to the others.
+- Note: MAI phrase boundaries often span the entire audio; using the realtime anchor here makes UPL directly comparable across services.
 - **First Latency** is omitted because the REST response is delivered in one shot — there is no first-token signal to measure against.
 - **VAD truncation**: when realtime ran first and produced word timestamps, fast_* audio is truncated at `speech_end + 500 ms` to simulate a VAD cutting the stream after end-of-speech. This reduces upload time and makes LBL/UPL realistic for a VAD-equipped pipeline. The CSV column `vad_truncated_s` records the truncated duration (blank when no truncation was applied).
 

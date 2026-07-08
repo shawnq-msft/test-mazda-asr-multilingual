@@ -1,3 +1,7 @@
 .env
 TestAudio3.0/
 TestAudio3.0.zip
+
+# Generated benchmark/test outputs. Existing tracked result samples remain tracked;
+# new sample fixture folders such as colab_* stay visible.
+results/

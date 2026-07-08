@@ -1,0 +1,3 @@
+-r requirements.txt
+hojo-asr
+huggingface_hub[cli]

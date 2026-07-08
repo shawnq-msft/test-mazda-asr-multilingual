@@ -1,0 +1,5 @@
+-r requirements.txt
+
+foundry-local-sdk-winml; platform_system == "Windows"
+foundry-local-sdk; platform_system != "Windows"
+openai

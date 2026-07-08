@@ -5,7 +5,7 @@ import argparse
 import time
 from pathlib import Path
 
-from benchmark.config import LOCALES, SERVICES, assert_credentials
+from benchmark.config import AZURE_SERVICES, LOCALES, SERVICES, assert_credentials
 from benchmark.datasets_loader import iter_samples, list_datasets
 from benchmark.report import build_report
 from benchmark.runner import run_benchmark
@@ -24,7 +24,8 @@ def main():
     p.add_argument("--seed", type=int, default=42)
     args = p.parse_args()
 
-    assert_credentials()
+    if any(s in AZURE_SERVICES for s in args.services):
+        assert_credentials()
 
     for lang in args.languages:
         print(f"\n{'='*60}")

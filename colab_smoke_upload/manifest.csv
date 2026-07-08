@@ -1,0 +1,3 @@
+﻿dataset,sample_id,locale,reference,audio_path,duration_s
+en-GB_JT1,2r_en-GB_female-JT1/Minimum driver seat heating.wav,en-GB,Minimum driver seat heating,2r_en-GB_female-JT1__Minimum driver seat heating.wav,4.23
+en-GB_JT1,1l_en-GB_male-JT1/Close front row window to half.wav,en-GB,Close front row window to half,1l_en-GB_male-JT1__Close front row window to half.wav,4.67

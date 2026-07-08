@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from benchmark.datasets_loader import iter_samples, write_pcm16_wav  # noqa: E402
 from benchmark.metrics import aggregate, normalize_text  # noqa: E402
 
-ALL_KNOWN_SERVICES = ("fast_default", "fast_llm", "fast_mai", "realtime", "realtime_refine", "whisper_v3")
+ALL_KNOWN_SERVICES = ("fast_default", "fast_llm", "fast_mai_1", "fast_mai_1.5", "realtime", "realtime_refine", "whisper_v3", "hojo_asr", "foundry_whisper_v3", "foundry_nemotron_asr", "xiaomi_mimo_2.5")
 
 
 def wer_calc(ref: str, hyp: str) -> float:
